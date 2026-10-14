@@ -1,0 +1,2 @@
+# oatschema-python
+Python package
