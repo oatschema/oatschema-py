@@ -1,0 +1,16 @@
+{
+  "tag": "v0.5.0",
+  "commit": "1e8f57eb91bae26e8f2db23e2750f1fa4678d90d",
+  "files": {
+    "audio-transcription.json": "a56d1f042ef3993dbd3287d08518e1d5ba78d670ceb71071260b4aa3fbcfeb5a",
+    "classification.json": "60144b51c826a8fe543b7a8e496654e0fa704aa027bba2523fcfc338a46aac35",
+    "document-extraction.json": "4913e36dabb6ac956256dbd2d83dceed9288cd85dedb5b3598ec83bbd3d0c602",
+    "embedding.json": "6ac85b1fb27780e316f345e5d188d68410204827fec41c8548ab912169bc3c5d",
+    "entity-extraction.json": "c0bafcca50b4943896ec9386404d7fd477cff2e16a26e57bef44e13f1f6c8ba0",
+    "generic.json": "ea03319a174382eceb637f9d441105acca86ab17f97fb4ea3be93998c7f776c2",
+    "geolocation.json": "0a345acd13caeca85a6cf3d30e8732867fd13b7d3fb5ab99c93b9afaf10e9d94",
+    "llm-output.json": "9f766e2cbbba32010af6d5ad30a075632ac612e1519754cf9a4f303686b53ec2",
+    "object-detection.json": "deb9284a3c041c4b665acb765a7a1dac503f8163ec53870a6eda84fa4d429535",
+    "regression.json": "71bf68825e272bd68ae2547d5029644bb3b956f5e38c01d2a81d1b6a0f206bde"
+  }
+}

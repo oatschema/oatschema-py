@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "oatschema"
+dynamic = ["version"]
+description = "OATS (Open Annotation Task Schemas) JSON schemas, bundled for Python."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Rio Achuzia", email = "rio@dorsalhub.com" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+validate = ["jsonschema-rs>=0.38"]
+all = ["oatschema[validate]"]
+
+[project.urls]
+"Homepage" = "https://oatschema.org"
+"Repository" = "https://github.com/oatschema/oatschema-python"
+
+[tool.hatch.version]
+path = "src/oatschema/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/oatschema"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.claude", "/venv", "uv.lock", ".github"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["scripts"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = ["F401"]
+
+[tool.mypy]
+exclude = ["dist/", "build/", "venv/", ".venv/"]
+mypy_path = ["src", "scripts"]
+warn_unreachable = true
+strict = true
+
+[dependency-groups]
+dev = [
+    "jsonschema-rs>=0.38",
+    "mypy>=1.15.0",
+    "packaging>=24.0",
+    "pytest>=8.3.4",
+    "ruff>=0.8.4",
+]

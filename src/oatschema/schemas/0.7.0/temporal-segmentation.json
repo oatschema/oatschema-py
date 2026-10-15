@@ -1,0 +1,202 @@
+{
+    "x-license": {
+        "id": "Apache-2.0",
+        "notice": "Copyright 2025-2026 Dorsal Hub LTD",
+        "url": "https://github.com/oatschema/oats/blob/main/LICENSE"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://oatschema.org/0.7.0/temporal-segmentation",
+    "title": "Temporal Segmentation",
+    "version": "0.7.0",
+    "description": "Represent labelled time intervals within a media source, such as chapters, scenes, shots, speaker turns or detected events. Segments may overlap, may nest, and need not cover the whole source.",
+    "type": "object",
+    "properties": {
+        "producer": {
+            "type": "string",
+            "description": "The creator (model, tool or author) of these segments (e.g., 'PySceneDetect', 'pyannote', 'Manual Review').",
+            "maxLength": 1024
+        },
+        "track_id": {
+            "type": "string",
+            "description": "(Optional) Identifier for the specific audio or video track in the source file. Numeric identifiers are written as strings (e.g., '0').",
+            "maxLength": 128
+        },
+        "duration": {
+            "type": "number",
+            "description": "The total duration of the source media in seconds. When present, no segment's end_time may exceed it.",
+            "minimum": 0
+        },
+        "vocabulary": {
+            "type": "array",
+            "description": "A list of the possible segment labels. For more than 100 labels, use 'vocabulary_url'.",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "description": "A single valid label from the vocabulary.",
+                "maxLength": 128
+            }
+        },
+        "vocabulary_url": {
+            "type": "string",
+            "description": "A URL pointing to a more detailed external vocabulary or ontology.",
+            "format": "uri",
+            "maxLength": 2048
+        },
+        "score_explanation": {
+            "type": "string",
+            "description": "Defines the meaning of the 'score' field.",
+            "maxLength": 256
+        },
+        "segments": {
+            "type": "array",
+            "description": "The labelled time intervals. Can be empty if no segments were found.",
+            "maxItems": 100000,
+            "items": {
+                "type": "object",
+                "description": "A single labelled time interval.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "An identifier for this segment (e.g., 'scene-12'). Must be unique within the record.",
+                        "maxLength": 128
+                    },
+                    "parent_id": {
+                        "type": "string",
+                        "description": "The id of the segment that contains this one (e.g., the chapter containing a scene). Must be the id of another segment in the record, and this segment must lie within its parent's interval.",
+                        "maxLength": 128
+                    },
+                    "group_id": {
+                        "type": "string",
+                        "description": "An identifier for the entity this segment belongs to. Segments sharing a group_id belong to the same entity (e.g., all turns of speaker 'SPEAKER_00'). Numeric identifiers, such as diarization cluster numbers, are written as strings (e.g., '0').",
+                        "maxLength": 128
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "The category of the segment (e.g., 'chapter', 'scene', 'speaker', 'explosion'). Must be a member of 'vocabulary' when it is present.",
+                        "maxLength": 128
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "A human-readable name for this segment (e.g., a chapter title).",
+                        "maxLength": 128
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description of what happens in this segment.",
+                        "maxLength": 1024
+                    },
+                    "start_time": {
+                        "type": "number",
+                        "description": "Segment start time in seconds from the start of the source.",
+                        "minimum": 0
+                    },
+                    "end_time": {
+                        "type": "number",
+                        "description": "Segment end time in seconds from the start of the source. Must not be earlier than start_time; equal times mark an instantaneous event.",
+                        "minimum": 0
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "The confidence that the label applies to this interval, ranging from 0.0 (uncertain) to 1.0 (certain).",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "description": "Arbitrary metadata relevant to this segment.",
+                        "maxProperties": 16,
+                        "propertyNames": {
+                            "maxLength": 128
+                        },
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "maxLength": 1024
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "label",
+                    "start_time",
+                    "end_time"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "attributes": {
+            "type": "object",
+            "description": "Arbitrary metadata relevant to this record (e.g., annotator, source, job ID).",
+            "maxProperties": 16,
+            "propertyNames": {
+                "maxLength": 128
+            },
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "segments"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "segments": {
+                        "maxItems": 0
+                    }
+                },
+                "required": [
+                    "segments"
+                ]
+            },
+            "then": {
+                "anyOf": [
+                    {
+                        "required": [
+                            "vocabulary"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "vocabulary_url"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "producer"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "additionalProperties": false
+}
