@@ -1,0 +1,18 @@
+{
+  "tag": "v0.8.0",
+  "commit": "e3273992b7ec044d3d97991eea30035bc0ad492c",
+  "files": {
+    "audio-transcription.json": "56702edd2694d28aa7a980f267d86cc99039a1267ca16745829f85d6a6f37acd",
+    "classification.json": "d908f1a29764dfc754b20ad289a93abccb1c70af387e6cfdce27ee124fa880eb",
+    "document-extraction.json": "6e5433c7a60817e9e177ecd9014a0fe8d31842edb13b15e6c1fa49aa220acae1",
+    "embedding.json": "9f67faa9e406bf3d28a5323a713961ebc51026a07dc7064bb1c9f833f66845ed",
+    "entity-extraction.json": "1da404013b60280d76e013fd139cc579263e20c249e327a9a7f488bfa74cd06d",
+    "generic.json": "e35283ce38c2cad59696ae88ece223574f6c12375fa0ccbad0eac51d8b0cec54",
+    "geolocation.json": "be251cb767a1f38311a1b3a7538ba1b0befc4b3f9ef8bb062a008f8219281d89",
+    "llm-output.json": "5c0209e9c7a02636b3f103745ef875fd4c65ac4d25d8cf8e14756d11a74a5b51",
+    "object-detection.json": "3b503ec38a815cf762f879bdbd0dddf5edeaf06154a16cadb20429e4e3271c08",
+    "ranking.json": "d56aaf018497141fa858914817c03e5aeff451f3e7a383914bf153ffb05dc014",
+    "regression.json": "6e91a09868195efa93a074a0a4a992a1134ae2f2780c512965bab5477a86f49e",
+    "temporal-segmentation.json": "51cd0a8d0c15e1c30039979cd6462b9b797e07240fbe3b94c84d18d5f6a609af"
+  }
+}

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 name: CI
 
 on:
@@ -30,3 +33,18 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy src tests scripts
       - run: uv run pytest -q -rs
+
+  lowest:
+    runs-on: ubuntu-latest
+    env:
+      OATS_REPO: ${{ github.workspace }}/../oats
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+      - name: Clone oats for the release-example tests
+        run: git clone --quiet https://github.com/oatschema/oats "$OATS_REPO"
+      - run: uv sync --resolution lowest-direct
+      - run: uv run --no-sync python -c "import importlib.metadata as m; print('jsonschema-rs', m.version('jsonschema-rs'))"
+      - run: uv run --no-sync pytest -q -rs

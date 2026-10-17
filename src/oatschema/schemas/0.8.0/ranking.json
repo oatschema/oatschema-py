@@ -1,0 +1,141 @@
+{
+    "x-license": {
+        "id": "Apache-2.0",
+        "notice": "Copyright 2025-2026 The OATS Authors",
+        "url": "https://github.com/oatschema/oats/blob/main/LICENSE"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://oatschema.org/0.8.0/ranking",
+    "title": "Ranking",
+    "x-version": "0.8.0",
+    "description": "Represent a ranked list of items related to a query, such as search results, retrieved passages, recommendations or near-duplicate matches.",
+    "type": "object",
+    "properties": {
+        "target": {
+            "type": "string",
+            "description": "What the ranking measures (e.g., 'relevance', 'near-duplicate', 'recording-match').",
+            "maxLength": 256
+        },
+        "producer": {
+            "type": "string",
+            "description": "The creator (model, tool or author) of this ranking.",
+            "maxLength": 1024
+        },
+        "query": {
+            "type": "string",
+            "description": "The text of the query, if there was one. Omitted when there was no text query (e.g. near-duplicates of a given image, or recommendations for a user).",
+            "maxLength": 4096
+        },
+        "collection": {
+            "type": "string",
+            "description": "The name of the set the ranked items were drawn from, such as a search index, document collection or product catalogue (e.g., 'lease-agreements').",
+            "maxLength": 1024
+        },
+        "score_explanation": {
+            "type": "string",
+            "description": "Defines the meaning of the 'score' field.",
+            "maxLength": 256
+        },
+        "total_candidates": {
+            "type": "integer",
+            "description": "The number of candidates considered before the list was cut down to 'results'. Must not be less than the number of results, or than any result's rank.",
+            "minimum": 0
+        },
+        "results": {
+            "type": "array",
+            "description": "The ranked items. Can be empty if nothing matched.",
+            "maxItems": 10000,
+            "items": {
+                "type": "object",
+                "description": "A single ranked item.",
+                "properties": {
+                    "rank": {
+                        "type": "integer",
+                        "description": "The position of this item in the full ranking, where 1 is the best match. Tied items share a rank, and gaps are allowed (e.g. after a tie, or when results are filtered or paginated). The order of the items is given by 'rank', not by their order in the array.",
+                        "minimum": 1
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "An identifier for the item, such as a document id within 'collection' or a URI that resolves to it. Must be unique within 'results'.",
+                        "maxLength": 2048
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "A human-readable name for the item.",
+                        "maxLength": 1024
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "An excerpt of the item's text, such as a search snippet or a retrieved passage. May be truncated; 'id' identifies the full item.",
+                        "maxLength": 4096
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "A normalized score for this item (-1.0 to 1.0). Higher values indicate greater relevance or similarity. Depending on the use case, this may represent a probability of relevance (0 to 1) or a signed similarity such as cosine similarity (-1 to 1). Use score_explanation to clarify.",
+                        "minimum": -1,
+                        "maximum": 1
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "description": "Arbitrary metadata for this item (e.g. a native score or distance, or the matched offset within a recording). Flat key-value pairs.",
+                        "maxProperties": 16,
+                        "propertyNames": {
+                            "maxLength": 128
+                        },
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "maxLength": 1024
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "rank",
+                    "id"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "attributes": {
+            "type": "object",
+            "description": "Arbitrary metadata relevant to this ranking.",
+            "maxProperties": 16,
+            "propertyNames": {
+                "maxLength": 128
+            },
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "results"
+    ],
+    "additionalProperties": false
+}

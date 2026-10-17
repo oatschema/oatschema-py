@@ -32,24 +32,26 @@ text = oatschema.get_schema("classification", mode="json")  # the schema file ex
 
 ## Schema versions
 
-Every function takes a `version`, which defaults to `oatschema.SCHEMA_VERSION`, the newest bundled version. Versions must be exact, such as `"0.7.0"`; `"0.7"` and `"latest"` are rejected.
+Every function takes a `version`, which defaults to `oatschema.SCHEMA_VERSION`, the newest bundled version. Versions must be exact, such as `"0.8.0"`; `"0.8"` and `"latest"` are rejected.
 
 `oatschema.available_versions()` lists every bundled version, oldest first. Before 1.0.0, a schema version may reject records that an older one accepted, so validate a record against the version it was written for.
 
-Versions 0.4.0 to 0.6.0 are listed in `oatschema.LEGACY_VERSIONS`. They predate OATS, and each schema's `$id` is `https://dorsalhub.com/schemas/open/<name>` in all three. Build each validator from a single schema, and never load two of these versions into one JSON Schema registry. From 0.7.0, `$id`s include the version (`https://oatschema.org/0.7.0/classification`), so versions can sit side by side.
+Each schema states its own version: in the `x-version` keyword from 0.8.0, and in `version` up to 0.7.0.
+
+Versions 0.4.0 to 0.6.0 are listed in `oatschema.LEGACY_VERSIONS`. They predate OATS, and each schema's `$id` is `https://dorsalhub.com/schemas/open/<name>` in all three. Build each validator from a single schema, and never load two of these versions into one JSON Schema registry. From 0.7.0, `$id`s include the version (`https://oatschema.org/0.8.0/classification`), so versions can sit side by side.
 
 ## Package versions
 
 The package version is `a.b.c.d`:
 
 - `a.b.c` is the newest schema version the package bundles, equal to `oatschema.SCHEMA_VERSION`;
-- `d` is the package's own revision, for fixes and features that don't add a schema version. It is left out when it is 0, so the first release bundling schema 0.7.0 is `0.7.0`, followed by `0.7.0.1`, `0.7.0.2` and so on.
+- `d` is the package's own revision, for fixes and features that don't add a schema version. It is left out when it is 0, so the first release bundling schema 0.8.0 is `0.8.0`, followed by `0.8.0.1`, `0.8.0.2` and so on.
 
 Every package release bundles every earlier schema version too, so upgrading never removes a version you validate against. Pin like this:
 
-- before 1.0: `oatschema~=0.7.0`, because a new schema minor version may change what records are valid;
+- before 1.0: `oatschema~=0.8.0`, because a new schema minor version may change what records are valid;
 - from 1.0: `oatschema>=1.3,<2`.
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE). Copyright is held by The OATS Authors, listed in [AUTHORS](AUTHORS). Contributions need a DCO sign-off; see [CONTRIBUTING.md](CONTRIBUTING.md).

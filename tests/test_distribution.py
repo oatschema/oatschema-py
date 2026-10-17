@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 import shutil
 import subprocess
 import tarfile
@@ -34,8 +37,11 @@ def dist(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def test_wheel_contains_exactly_the_package(dist: Path) -> None:
     (wheel,) = dist.glob("*.whl")
     with zipfile.ZipFile(wheel) as archive:
-        names = {name for name in archive.namelist() if not name.startswith("oatschema-")}
+        all_names = archive.namelist()
+    names = {name for name in all_names if not name.startswith("oatschema-")}
     assert names == package_files()
+    dist_info = f"oatschema-{oatschema.__version__}.dist-info"
+    assert {f"{dist_info}/licenses/LICENSE", f"{dist_info}/licenses/AUTHORS"} <= set(all_names)
     assert "oatschema/py.typed" in names
     assert {f"oatschema/schemas/{version}/MANIFEST.json" for version in oatschema.available_versions()} <= names
 
@@ -47,6 +53,10 @@ def test_wheel_metadata(dist: Path) -> None:
     assert metadata["Name"] == "oatschema"
     assert metadata["Version"] == oatschema.__version__
     assert metadata["Requires-Python"] == ">=3.11"
+    assert metadata["License-Expression"] == "Apache-2.0"
+    assert set(metadata.get_all("License-File") or []) == {"LICENSE", "AUTHORS"}
+    assert metadata["Author-email"] == "OATS maintainers <maintainers@oatschema.org>"
+    assert not any(classifier.startswith("License ::") for classifier in metadata.get_all("Classifier") or [])
     assert set(metadata.get_all("Provides-Extra") or []) == {"all", "validate"}
     requirements = metadata.get_all("Requires-Dist") or []
     assert requirements, "the validate extra should declare jsonschema-rs"
@@ -58,7 +68,7 @@ def test_sdist_can_run_the_tests(dist: Path) -> None:
     root = f"oatschema-{oatschema.__version__}"
     with tarfile.open(sdist) as archive:
         names = {name.removeprefix(f"{root}/") for name in archive.getnames()}
-    assert {"pyproject.toml", "README.md", "LICENSE", "scripts/sync_schemas.py"} <= names
+    assert {"pyproject.toml", "README.md", "LICENSE", "AUTHORS", "scripts/sync_schemas.py"} <= names
     assert {path.relative_to(PROJECT).as_posix() for path in (PROJECT / "tests").glob("*.py")} <= names
     assert {f"src/{name}" for name in package_files()} <= names
     assert not any(name.startswith((".claude", "venv/", ".venv/")) for name in names)

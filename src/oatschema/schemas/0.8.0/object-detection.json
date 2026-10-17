@@ -1,0 +1,383 @@
+{
+    "x-license": {
+        "id": "Apache-2.0",
+        "notice": "Copyright 2025-2026 The OATS Authors",
+        "url": "https://github.com/oatschema/oats/blob/main/LICENSE"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://oatschema.org/0.8.0/object-detection",
+    "title": "Object Detection",
+    "x-version": "0.8.0",
+    "description": "Represent objects detected within a source. Supports bounding boxes, polygons, hierarchical relationships, and confidence scores.",
+    "type": "object",
+    "properties": {
+        "unit": {
+            "type": "string",
+            "description": "The unit for all coordinate values: 'px' for pixels, 'pt' for typographic points, 'normalized' for values from 0.0 to 1.0, and 'per_mille' for values from 0 to 1000. Required whenever geometric data is present.",
+            "enum": [
+                "px",
+                "pt",
+                "normalized",
+                "per_mille"
+            ]
+        },
+        "producer": {
+            "type": "string",
+            "description": "The creator (model, tool or author) of this record.",
+            "maxLength": 1024
+        },
+        "vocabulary_url": {
+            "type": "string",
+            "description": "A URL pointing to a more detailed external vocabulary or ontology.",
+            "format": "uri",
+            "maxLength": 2048
+        },
+        "vocabulary": {
+            "type": "array",
+            "description": "A list of the possible labels for detected objects. For more than 100 labels, use 'vocabulary_url'.",
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "description": "A single valid label from the vocabulary.",
+                "maxLength": 128
+            }
+        },
+        "score_explanation": {
+            "type": "string",
+            "description": "Defines the meaning and range of the 'score' field.",
+            "maxLength": 256
+        },
+        "objects": {
+            "type": "array",
+            "description": "The detected objects.",
+            "maxItems": 100000,
+            "items": {
+                "type": "object",
+                "description": "A single detected object.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "A unique identifier for this object within this record (e.g., UUID4). Required for establishing hierarchies.",
+                        "maxLength": 128
+                    },
+                    "parent_id": {
+                        "type": "string",
+                        "description": "The id of the parent object, if this object is nested within another.",
+                        "maxLength": 128
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "The label of the detected object (e.g., 'car', 'face', 'logo'). Must be a member of 'vocabulary' when it is present.",
+                        "maxLength": 128
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "A normalized score for this detection (-1.0 to 1.0). Positive values [0, 1] represent confidence in the object's presence. Negative values [-1, 0) are reserved for 'hard negatives' (e.g., explicitly marking that an object is not present in this region).",
+                        "minimum": -1,
+                        "maximum": 1
+                    },
+                    "box": {
+                        "type": "object",
+                        "description": "A rectangular bounding box defined by its top-left corner (x, y) and its dimensions.",
+                        "properties": {
+                            "x": {
+                                "type": "number",
+                                "description": "The x-coordinate of the top-left corner.",
+                                "minimum": 0
+                            },
+                            "y": {
+                                "type": "number",
+                                "description": "The y-coordinate of the top-left corner.",
+                                "minimum": 0
+                            },
+                            "width": {
+                                "type": "number",
+                                "description": "The width of the box.",
+                                "minimum": 0
+                            },
+                            "height": {
+                                "type": "number",
+                                "description": "The height of the box.",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "x",
+                            "y",
+                            "width",
+                            "height"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "polygon": {
+                        "type": "array",
+                        "description": "An ordered list of vertices defining a non-rectangular boundary.",
+                        "minItems": 3,
+                        "maxItems": 1000,
+                        "items": {
+                            "type": "object",
+                            "description": "A single vertex, measured from the top-left corner of the page or image.",
+                            "properties": {
+                                "x": {
+                                    "type": "number",
+                                    "description": "The x-coordinate of the vertex.",
+                                    "minimum": 0
+                                },
+                                "y": {
+                                    "type": "number",
+                                    "description": "The y-coordinate of the vertex.",
+                                    "minimum": 0
+                                }
+                            },
+                            "required": [
+                                "x",
+                                "y"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "multi_polygon": {
+                        "type": "array",
+                        "description": "A list of polygons, for a single region that is occluded or fragmented into multiple visible parts.",
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "items": {
+                            "type": "array",
+                            "description": "An ordered list of vertices defining a non-rectangular boundary.",
+                            "minItems": 3,
+                            "maxItems": 1000,
+                            "items": {
+                                "type": "object",
+                                "description": "A single vertex, measured from the top-left corner of the page or image.",
+                                "properties": {
+                                    "x": {
+                                        "type": "number",
+                                        "description": "The x-coordinate of the vertex.",
+                                        "minimum": 0
+                                    },
+                                    "y": {
+                                        "type": "number",
+                                        "description": "The y-coordinate of the vertex.",
+                                        "minimum": 0
+                                    }
+                                },
+                                "required": [
+                                    "x",
+                                    "y"
+                                ],
+                                "additionalProperties": false
+                            }
+                        }
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "description": "Arbitrary metadata relevant to this item.",
+                        "maxProperties": 16,
+                        "propertyNames": {
+                            "maxLength": 128
+                        },
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "maxLength": 1024
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "label"
+                ],
+                "oneOf": [
+                    {
+                        "required": [
+                            "box"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "polygon"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "multi_polygon"
+                        ]
+                    }
+                ],
+                "additionalProperties": false
+            }
+        },
+        "attributes": {
+            "type": "object",
+            "description": "Arbitrary metadata relevant to this record.",
+            "maxProperties": 16,
+            "propertyNames": {
+                "maxLength": 128
+            },
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "unit",
+        "objects"
+    ],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "unit": {
+                        "const": "normalized"
+                    }
+                },
+                "required": [
+                    "unit"
+                ]
+            },
+            "then": {
+                "properties": {
+                    "objects": {
+                        "items": {
+                            "properties": {
+                                "box": {
+                                    "properties": {
+                                        "x": {
+                                            "maximum": 1
+                                        },
+                                        "y": {
+                                            "maximum": 1
+                                        },
+                                        "width": {
+                                            "maximum": 1
+                                        },
+                                        "height": {
+                                            "maximum": 1
+                                        }
+                                    }
+                                },
+                                "polygon": {
+                                    "items": {
+                                        "properties": {
+                                            "x": {
+                                                "maximum": 1
+                                            },
+                                            "y": {
+                                                "maximum": 1
+                                            }
+                                        }
+                                    }
+                                },
+                                "multi_polygon": {
+                                    "items": {
+                                        "items": {
+                                            "properties": {
+                                                "x": {
+                                                    "maximum": 1
+                                                },
+                                                "y": {
+                                                    "maximum": 1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "if": {
+                "properties": {
+                    "unit": {
+                        "const": "per_mille"
+                    }
+                },
+                "required": [
+                    "unit"
+                ]
+            },
+            "then": {
+                "properties": {
+                    "objects": {
+                        "items": {
+                            "properties": {
+                                "box": {
+                                    "properties": {
+                                        "x": {
+                                            "maximum": 1000
+                                        },
+                                        "y": {
+                                            "maximum": 1000
+                                        },
+                                        "width": {
+                                            "maximum": 1000
+                                        },
+                                        "height": {
+                                            "maximum": 1000
+                                        }
+                                    }
+                                },
+                                "polygon": {
+                                    "items": {
+                                        "properties": {
+                                            "x": {
+                                                "maximum": 1000
+                                            },
+                                            "y": {
+                                                "maximum": 1000
+                                            }
+                                        }
+                                    }
+                                },
+                                "multi_polygon": {
+                                    "items": {
+                                        "items": {
+                                            "properties": {
+                                                "x": {
+                                                    "maximum": 1000
+                                                },
+                                                "y": {
+                                                    "maximum": 1000
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "additionalProperties": false
+}

@@ -1,5 +1,8 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
@@ -8,8 +11,9 @@ dynamic = ["version"]
 description = "OATS (Open Annotation Task Schemas) JSON schemas, bundled for Python."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
-authors = [{ name = "Rio Achuzia", email = "rio@dorsalhub.com" }]
+license = "Apache-2.0"
+license-files = ["LICENSE", "AUTHORS"]
+authors = [{ name = "OATS maintainers", email = "maintainers@oatschema.org" }]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
@@ -17,7 +21,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Typing :: Typed",
 ]

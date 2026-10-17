@@ -1,5 +1,9 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, cast, get_args
 
@@ -12,6 +16,15 @@ from oatschema import LEGACY_VERSIONS, SCHEMA_VERSION, SchemaName, available_ver
 
 SCHEMAS_DIR = Path(oatschema.__file__).parent / "schemas"
 RESERVED_NAMES = {"changelog", "docs", "latest"}
+NOTICE_PATTERN = re.compile(r"Copyright \d{4}(?:-\d{4})? The OATS Authors")
+
+
+def declared_version(schema: dict[str, Any], version: str) -> Any:
+    if Version(version) >= Version("0.8.0"):
+        assert "version" not in schema
+        return schema["x-version"]
+    assert "x-version" not in schema
+    return schema["version"]
 
 
 def bundled_names(version: str) -> set[str]:
@@ -57,12 +70,15 @@ def test_names_are_servable() -> None:
 @pytest.mark.parametrize(("version", "name"), all_schemas())
 def test_schema_identity(version: str, name: SchemaName) -> None:
     schema = get_schema(name, version)
-    assert schema["version"] == version
+    assert declared_version(schema, version) == version
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
     if Version(version) < Version("0.7.0"):
         assert schema["$id"] == f"https://dorsalhub.com/schemas/open/{name}"
     else:
         assert schema["$id"] == f"https://oatschema.org/{version}/{name}"
+    if Version(version) >= Version("0.8.0"):
+        assert schema["x-license"]["id"] == "Apache-2.0"
+        assert NOTICE_PATTERN.fullmatch(schema["x-license"]["notice"])
 
 
 @pytest.mark.parametrize(("version", "name"), all_schemas())
@@ -84,7 +100,7 @@ def test_manifest_matches_bundled_files(version: str) -> None:
 
 def test_get_schema_defaults_to_schema_version() -> None:
     assert get_schema("classification") == get_schema("classification", SCHEMA_VERSION)
-    assert get_schema("classification")["version"] == SCHEMA_VERSION
+    assert declared_version(get_schema("classification"), SCHEMA_VERSION) == SCHEMA_VERSION
 
 
 def test_get_schema_returns_independent_copies() -> None:
@@ -109,9 +125,10 @@ def test_get_schema_rejects_inexact_or_unbundled_version(version: str) -> None:
         get_schema("classification", version)
 
 
-def test_get_schema_rejects_name_missing_from_version() -> None:
-    with pytest.raises(LookupError, match="not in schema version 0.6.0"):
-        get_schema("temporal-segmentation", "0.6.0")
+@pytest.mark.parametrize(("name", "version"), [("temporal-segmentation", "0.6.0"), ("ranking", "0.7.0")])
+def test_get_schema_rejects_name_missing_from_version(name: SchemaName, version: str) -> None:
+    with pytest.raises(LookupError, match=f"not in schema version {version}"):
+        get_schema(name, version)
 
 
 def test_unknown_name_wins_over_unknown_version() -> None:

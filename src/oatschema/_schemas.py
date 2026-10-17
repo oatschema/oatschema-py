@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 import json
 import re
 from functools import cache
@@ -15,11 +18,12 @@ SchemaName = Literal[
     "geolocation",
     "llm-output",
     "object-detection",
+    "ranking",
     "regression",
     "temporal-segmentation",
 ]
 
-SCHEMA_VERSION = "0.7.0"
+SCHEMA_VERSION = "0.8.0"
 LEGACY_VERSIONS = ("0.4.0", "0.5.0", "0.6.0")
 
 _VERSION_PATTERN = re.compile(r"(\d+)\.(\d+)\.(\d+)")
@@ -84,7 +88,7 @@ def get_schema(name: SchemaName, version: str | None = None, *, mode: Literal["d
 
     With ``mode="dict"`` (the default), each call returns a new dict, so callers may modify it freely.
     With ``mode="json"``, it returns the schema file's text exactly as released.
-    ``version`` must be an exact bundled version such as ``"0.7.0"``; partial versions and aliases are not accepted.
+    ``version`` must be an exact bundled version such as ``"0.8.0"``; partial versions and aliases are not accepted.
 
     Raises:
         ValueError: ``name`` is not a schema in any bundled version, or ``mode`` is not ``"dict"`` or ``"json"``.

@@ -1,0 +1,54 @@
+{
+    "x-license": {
+        "id": "Apache-2.0",
+        "notice": "Copyright 2025-2026 The OATS Authors",
+        "url": "https://github.com/oatschema/oats/blob/main/LICENSE"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://oatschema.org/0.8.0/generic",
+    "title": "Generic",
+    "x-version": "0.8.0",
+    "description": "A flexible schema for storing arbitrary key-value data.",
+    "type": "object",
+    "properties": {
+        "description": {
+            "type": "string",
+            "description": "Describe the data.",
+            "maxLength": 1024
+        },
+        "producer": {
+            "type": "string",
+            "description": "The creator (model, tool or author) of this record.",
+            "maxLength": 1024
+        },
+        "data": {
+            "type": "object",
+            "description": "An object containing custom key-value data. Nesting is disallowed.",
+            "maxProperties": 128,
+            "propertyNames": {
+                "maxLength": 128
+            },
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "data"
+    ],
+    "additionalProperties": false
+}

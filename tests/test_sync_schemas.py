@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 import hashlib
 import json
 import subprocess
@@ -10,17 +13,28 @@ import sync_schemas
 from sync_schemas import SyncError
 
 
+OATS_LICENSE = {
+    "id": "Apache-2.0",
+    "notice": "Copyright 2025-2026 The OATS Authors",
+    "url": "https://github.com/oatschema/oats/blob/main/LICENSE",
+}
+REMOVE = object()
+
+
 def schema_bytes(name: str, version: str, /, **overrides: Any) -> bytes:
     numeric = sync_schemas.parse_tag(f"v{version}")
-    schema = {
+    schema: dict[str, Any] = {
         "$schema": sync_schemas.METASCHEMA,
         "$id": sync_schemas.expected_id(name, numeric),
         "title": name,
-        "version": version,
-        "type": "object",
     }
+    if numeric >= sync_schemas.FIRST_X_VERSION:
+        schema |= {"x-version": version, "x-license": OATS_LICENSE}
+    else:
+        schema["version"] = version
+    schema["type"] = "object"
     schema.update(overrides)
-    return json.dumps(schema, indent=2).encode()
+    return json.dumps({key: value for key, value in schema.items() if value is not REMOVE}, indent=2).encode()
 
 
 def git(repo: Path, *args: str) -> str:
@@ -65,9 +79,42 @@ def test_check_name_rejects(name: str) -> None:
         sync_schemas.check_name(name)
 
 
-def test_check_schema_accepts_both_id_forms() -> None:
+def test_check_schema_accepts_each_release_shape() -> None:
     sync_schemas.check_schema("generic", schema_bytes("generic", "0.6.0"), (0, 6, 0))
     sync_schemas.check_schema("generic", schema_bytes("generic", "0.7.0"), (0, 7, 0))
+    sync_schemas.check_schema("generic", schema_bytes("generic", "0.8.0"), (0, 8, 0))
+
+
+@pytest.mark.parametrize("notice", ["Copyright 2026 The OATS Authors", "Copyright 2025-2027 The OATS Authors"])
+def test_check_schema_accepts_any_notice_year(notice: str) -> None:
+    data = schema_bytes("generic", "0.8.0", **{"x-license": {**OATS_LICENSE, "notice": notice}})
+    sync_schemas.check_schema("generic", data, (0, 8, 0))
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"version": "0.8.0"}, "top-level version"),
+        ({"x-version": REMOVE}, "x-version"),
+        ({"x-version": "0.7.0"}, "x-version"),
+        ({"x-version": REMOVE, "version": "0.8.0"}, "x-version"),
+        ({"x-license": REMOVE}, "x-license is None"),
+        ({"x-license": "Apache-2.0"}, "expected an object"),
+        ({"x-license": {**OATS_LICENSE, "id": "MIT"}}, "x-license id"),
+        ({"x-license": {**OATS_LICENSE, "notice": "Copyright 2025-2026 Dorsal Hub LTD"}}, "notice"),
+        ({"x-license": {**OATS_LICENSE, "notice": "Copyright The OATS Authors"}}, "notice"),
+        ({"$id": "https://oatschema.org/0.7.0/generic"}, r"\$id"),
+    ],
+)
+def test_check_schema_rejects_from_0_8_0(overrides: dict[str, Any], message: str) -> None:
+    with pytest.raises(SyncError, match=message):
+        sync_schemas.check_schema("generic", schema_bytes("generic", "0.8.0", **overrides), (0, 8, 0))
+
+
+def test_check_schema_rejects_x_version_before_0_8_0() -> None:
+    data = schema_bytes("generic", "0.7.0", version=REMOVE, **{"x-version": "0.7.0"})
+    with pytest.raises(SyncError, match="version is None"):
+        sync_schemas.check_schema("generic", data, (0, 7, 0))
 
 
 @pytest.mark.parametrize(

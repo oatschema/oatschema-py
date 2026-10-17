@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 import json
 import os
 import subprocess
@@ -68,7 +71,7 @@ def test_works_without_validate_extra() -> None:
 import sys
 sys.modules["jsonschema_rs"] = None
 import oatschema
-assert oatschema.get_schema("classification")["version"] == oatschema.SCHEMA_VERSION
+assert oatschema.get_schema("classification")["x-version"] == oatschema.SCHEMA_VERSION
 for call in (oatschema.get_validator, oatschema.validate, oatschema.is_valid):
     args = ("classification",) if call is oatschema.get_validator else ({}, "classification")
     try:

@@ -1,6 +1,9 @@
+# SPDX-FileCopyrightText: 2026 The OATS Authors
+# SPDX-License-Identifier: Apache-2.0
+
 """Bundle one OATS release into the package.
 
-Usage: ``python scripts/sync_schemas.py <oats-repo> <tag>``, e.g. ``python scripts/sync_schemas.py ~/projects/oats v0.7.0``.
+Usage: ``python scripts/sync_schemas.py <oats-repo> <tag>``, e.g. ``python scripts/sync_schemas.py ~/projects/oats v0.8.0``.
 
 Schemas are read from the tag, never the working tree, and copied byte for byte into
 ``src/oatschema/schemas/<version>/`` alongside a ``MANIFEST.json`` of SHA-256 checksums.
@@ -21,6 +24,9 @@ from typing import Any
 DEFAULT_DEST = Path(__file__).resolve().parent.parent / "src" / "oatschema" / "schemas"
 METASCHEMA = "https://json-schema.org/draft/2020-12/schema"
 FIRST_OATSCHEMA_ORG_VERSION = (0, 7, 0)
+FIRST_X_VERSION = (0, 8, 0)
+LICENSE_ID = "Apache-2.0"
+NOTICE_PATTERN = re.compile(r"Copyright \d{4}(?:-\d{4})? The OATS Authors")
 RESERVED_NAMES = frozenset({"changelog", "docs", "latest"})
 NAME_PATTERN = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
 TAG_PATTERN = re.compile(r"v(\d+)\.(\d+)\.(\d+)")
@@ -77,10 +83,27 @@ def check_schema(name: str, data: bytes, version: tuple[int, int, int]) -> None:
     if not isinstance(schema, dict):
         raise SyncError(f"{name}: not a JSON object")
     version_text = ".".join(map(str, version))
-    expected = {"$schema": METASCHEMA, "$id": expected_id(name, version), "version": version_text}
+    version_key = "x-version" if version >= FIRST_X_VERSION else "version"
+    expected = {"$schema": METASCHEMA, "$id": expected_id(name, version), version_key: version_text}
     for key, value in expected.items():
         if schema.get(key) != value:
             raise SyncError(f"{name}: {key} is {schema.get(key)!r}, expected {value!r}")
+    if version >= FIRST_X_VERSION:
+        check_oats_metadata(name, schema)
+
+
+def check_oats_metadata(name: str, schema: dict[str, Any]) -> None:
+    """Reject a schema from 0.8.0 onward that keeps ``version`` or lacks the OATS ``x-license``."""
+    if "version" in schema:
+        raise SyncError(f"{name}: has a top-level version; from 0.8.0 the schema's version is x-version")
+    license_ = schema.get("x-license")
+    if not isinstance(license_, dict):
+        raise SyncError(f"{name}: x-license is {license_!r}, expected an object")
+    if license_.get("id") != LICENSE_ID:
+        raise SyncError(f"{name}: x-license id is {license_.get('id')!r}, expected {LICENSE_ID!r}")
+    notice = license_.get("notice")
+    if not isinstance(notice, str) or not NOTICE_PATTERN.fullmatch(notice):
+        raise SyncError(f"{name}: x-license notice is {notice!r}, expected 'Copyright YYYY[-YYYY] The OATS Authors'")
 
 
 def _git(repo: Path, *args: str) -> bytes:
@@ -152,7 +175,7 @@ def sync(repo: Path, tag: str, dest: Path) -> Path:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else None)
     parser.add_argument("repo", type=Path, help="path to a checkout of oatschema/oats")
-    parser.add_argument("tag", help="release tag, e.g. v0.7.0")
+    parser.add_argument("tag", help="release tag, e.g. v0.8.0")
     parser.add_argument("--dest", type=Path, default=DEFAULT_DEST, help="schemas directory to bundle into")
     args = parser.parse_args(argv)
     try:

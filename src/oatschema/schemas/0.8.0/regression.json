@@ -1,0 +1,191 @@
+{
+    "x-license": {
+        "id": "Apache-2.0",
+        "notice": "Copyright 2025-2026 The OATS Authors",
+        "url": "https://github.com/oatschema/oats/blob/main/LICENSE"
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://oatschema.org/0.8.0/regression",
+    "title": "Regression",
+    "x-version": "0.8.0",
+    "description": "Represent continuous numerical predictions. Supports point estimates, confidence intervals, and time-series forecasting.",
+    "type": "object",
+    "properties": {
+        "target": {
+            "type": "string",
+            "description": "The name of or a reference to the variable being predicted (e.g., 'temperature', 'stock_price').",
+            "maxLength": 256
+        },
+        "unit": {
+            "type": "string",
+            "description": "The unit of measurement.",
+            "maxLength": 128
+        },
+        "producer": {
+            "type": "string",
+            "description": "The creator (model, tool or author) of this regression.",
+            "maxLength": 1024
+        },
+        "score_explanation": {
+            "type": "string",
+            "description": "Explanation of the score metric and its semantics (e.g. 'R-squared' or 'Model Confidence').",
+            "maxLength": 256
+        },
+        "points": {
+            "type": "array",
+            "description": "The regression data points. A single item represents a point estimate; multiple items represent a time series or distribution.",
+            "minItems": 1,
+            "maxItems": 10000,
+            "items": {
+                "type": "object",
+                "description": "A single predicted value.",
+                "properties": {
+                    "value": {
+                        "description": "The predicted or sampled value. Null represents a missing value, such as a gap in a time series.",
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "statistic": {
+                        "type": "string",
+                        "description": "The statistical nature of this value.",
+                        "enum": [
+                            "mean",
+                            "median",
+                            "mode",
+                            "min",
+                            "max",
+                            "quantile",
+                            "sample"
+                        ]
+                    },
+                    "quantile_level": {
+                        "type": "number",
+                        "description": "The quantile level (e.g., 0.95). Required when statistic is 'quantile', and only allowed then.",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 128,
+                        "description": "The specific time this prediction applies to."
+                    },
+                    "interval_lower": {
+                        "type": "number",
+                        "description": "The lower bound of the confidence interval."
+                    },
+                    "interval_upper": {
+                        "type": "number",
+                        "description": "The upper bound of the confidence interval. Must not be less than interval_lower."
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "A normalized score for this point (-1.0 to 1.0). Depending on the metric, this may be a probability (0 to 1) or a bipolar metric such as R-squared clipped to [-1, 1]. Use score_explanation to clarify.",
+                        "minimum": -1,
+                        "maximum": 1
+                    },
+                    "attributes": {
+                        "type": "object",
+                        "description": "Arbitrary metadata relevant to this point.",
+                        "maxProperties": 16,
+                        "propertyNames": {
+                            "maxLength": 128
+                        },
+                        "additionalProperties": {
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "maxLength": 1024
+                                },
+                                {
+                                    "type": "number"
+                                },
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "value"
+                ],
+                "allOf": [
+                    {
+                        "if": {
+                            "properties": {
+                                "statistic": {
+                                    "const": "quantile"
+                                }
+                            },
+                            "required": [
+                                "statistic"
+                            ]
+                        },
+                        "then": {
+                            "required": [
+                                "quantile_level"
+                            ]
+                        }
+                    },
+                    {
+                        "if": {
+                            "required": [
+                                "quantile_level"
+                            ]
+                        },
+                        "then": {
+                            "properties": {
+                                "statistic": {
+                                    "const": "quantile"
+                                }
+                            },
+                            "required": [
+                                "statistic"
+                            ]
+                        }
+                    }
+                ],
+                "additionalProperties": false
+            }
+        },
+        "attributes": {
+            "type": "object",
+            "description": "Arbitrary metadata relevant to this regression.",
+            "maxProperties": 16,
+            "propertyNames": {
+                "maxLength": 128
+            },
+            "additionalProperties": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "maxLength": 1024
+                    },
+                    {
+                        "type": "number"
+                    },
+                    {
+                        "type": "boolean"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "points"
+    ],
+    "additionalProperties": false
+}
