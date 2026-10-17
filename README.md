@@ -7,9 +7,9 @@
 
 The [OATS](https://oatschema.org) (Open Annotation Task Schemas) JSON schemas for Python.
 
-OATS is a set of strict, versioned JSON Schema 2020-12 schemas for the outputs of machine learning models, workflow steps and human annotation: one shape for a classification, a transcription or a set of detected objects, whatever produced it. This package bundles the schemas so you can validate those records anywhere. (OATS is unrelated to the W3C Web Annotation data model, formerly Open Annotation.)
+OATS is a collection of strict, versioned JSON Schema 2020-12 schemas, defining and validating the structured outputs of machine learning models, workflow steps and annotation. Models, pipelines and people write the same JSON for each task, so a classification, a transcription or a set of detected objects has one shape, whatever produced it. This package bundles the schemas so you can validate those records anywhere. (OATS is unrelated to the W3C Web Annotation data model, formerly Open Annotation.)
 
-- **No dependencies.** The core uses only the standard library. Validation is an optional extra built on [jsonschema-rs](https://github.com/Stranger6667/jsonschema).
+- **No dependencies, no network.** The core uses only the standard library and reads schemas from the installed package. Validation is an optional extra built on [jsonschema-rs](https://github.com/Stranger6667/jsonschema).
 - **Exactly as released.** Each schema is byte-identical to its [oatschema/oats](https://github.com/oatschema/oats) release, and a checksum manifest ships with every version.
 - **Every version.** Each release bundles every schema version from 0.4.0 on, so records keep validating against the version they were written for.
 - **Typed.** Ships `py.typed`. Schema names are a `Literal`, so mypy and pyright catch typos.
@@ -32,7 +32,7 @@ schema["$id"]  # "https://oatschema.org/0.8.0/classification"
 oatschema.SCHEMA_VERSION  # "0.8.0", used when you don't pass a version
 ```
 
-`pip install oatschema` installs the schemas alone, with no dependencies; `get_schema` works without the extra. `oatschema[all]` installs every optional feature.
+Requires Python 3.11 or later. `pip install oatschema` installs the schemas alone, with no dependencies; `get_schema` works without the extra. `oatschema[all]` installs every optional feature.
 
 ## Schemas
 
