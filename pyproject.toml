@@ -32,7 +32,7 @@ all = ["oatschema[validate]"]
 
 [project.urls]
 "Homepage" = "https://oatschema.org"
-"Repository" = "https://github.com/oatschema/oatschema-python"
+"Repository" = "https://github.com/oatschema/oatschema-py"
 
 [tool.hatch.version]
 path = "src/oatschema/__init__.py"

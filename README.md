@@ -2,8 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/oatschema.svg)](https://pypi.org/project/oatschema/)
 [![Python versions](https://img.shields.io/pypi/pyversions/oatschema.svg)](https://pypi.org/project/oatschema/)
-[![CI](https://github.com/oatschema/oatschema-python/actions/workflows/ci.yml/badge.svg)](https://github.com/oatschema/oatschema-python/actions/workflows/ci.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/oatschema/oatschema-python/blob/main/LICENSE)
+[![CI](https://github.com/oatschema/oatschema-py/actions/workflows/ci.yml/badge.svg)](https://github.com/oatschema/oatschema-py/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/oatschema/oatschema-py/blob/main/LICENSE)
 
 The [OATS](https://oatschema.org) (Open Annotation Task Schemas) JSON schemas for Python.
 
@@ -119,8 +119,8 @@ Upgrading never removes a schema version, but it does move the default `SCHEMA_V
 
 ## Contributing
 
-Schema changes belong in [oatschema/oats](https://github.com/oatschema/oats). For this package, see [CONTRIBUTING.md](https://github.com/oatschema/oatschema-python/blob/main/CONTRIBUTING.md). Commits need a DCO sign-off (`git commit -s`).
+Schema changes belong in [oatschema/oats](https://github.com/oatschema/oats). For this package, see [CONTRIBUTING.md](https://github.com/oatschema/oatschema-py/blob/main/CONTRIBUTING.md). Commits need a DCO sign-off (`git commit -s`).
 
 ## License
 
-Apache-2.0. Copyright [The OATS Authors](https://github.com/oatschema/oatschema-python/blob/main/AUTHORS).
+Apache-2.0. Copyright [The OATS Authors](https://github.com/oatschema/oatschema-py/blob/main/AUTHORS).

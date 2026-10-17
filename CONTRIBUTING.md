@@ -46,7 +46,7 @@ The tests check that these agree with the bundled files.
 
 ## Releasing
 
-Pushing a `v<__version__>` tag runs `.github/workflows/release.yml`, which runs CI, checks the tag against `__version__`, builds, and publishes to PyPI with trusted publishing. Running the workflow manually publishes to TestPyPI instead.
+A maintainer builds and publishes each release by hand, with `uv build` and then `uv publish`. CI only runs the checks and never publishes.
 
 ## Licensing and sign-off
 
