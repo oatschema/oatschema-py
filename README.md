@@ -61,7 +61,7 @@ Browse every schema, its fields and the changelog at [oatschema.org](https://oat
 try:
     oatschema.validate(record, "classification")
 except oatschema.ValidationError as error:
-    error.path         # ("labels", 0, "score"): where in the record
+    error.path  # ("labels", 0, "score"): where in the record
     error.schema_path  # ("properties", "labels", ..., "maximum"): which rule failed
     error.schema_name, error.schema_version  # "classification", "0.8.0"
 ```
