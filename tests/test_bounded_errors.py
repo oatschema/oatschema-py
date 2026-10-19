@@ -39,8 +39,10 @@ def formatted_traceback(error: ValidationError) -> str:
         return "".join(traceback.format_exception(raised))
 
 
-def matching_error(keyword: str, name: SchemaName, record: dict[str, Any]) -> ValidationError:
-    errors = [error for error in iter_errors(record, name) if error.keyword == keyword]
+def matching_error(
+    keyword: str, name: SchemaName, record: dict[str, Any], *, check_formats: bool = True
+) -> ValidationError:
+    errors = [error for error in iter_errors(record, name, check_formats=check_formats) if error.keyword == keyword]
     assert errors, f"no {keyword} error"
     return errors[0]
 
@@ -56,22 +58,32 @@ def assert_bounded(error: ValidationError) -> None:
     assert all(len(repr(value)) <= 1100 for key, value in vars(error).items() if key != "path")
 
 
+@pytest.mark.parametrize("check_formats", [True, False])
 @pytest.mark.parametrize(("keyword", "name", "record"), CASES, ids=[case[0] for case in CASES])
-def test_errors_are_bounded_for_huge_records(keyword: str, name: SchemaName, record: dict[str, Any]) -> None:
-    assert_bounded(matching_error(keyword, name, record))
+def test_errors_are_bounded_for_huge_records(
+    keyword: str, name: SchemaName, record: dict[str, Any], check_formats: bool
+) -> None:
+    if keyword == "format" and not check_formats:
+        keywords = [error.keyword for error in iter_errors(record, name, check_formats=False)]
+        assert keywords == ["maxLength"]
+        keyword = "maxLength"
+    assert_bounded(matching_error(keyword, name, record, check_formats=check_formats))
     with pytest.raises(ValidationError) as caught:
-        validate(record, name)
+        validate(record, name, check_formats=check_formats)
     assert_bounded(caught.value)
     assert len("".join(traceback.format_exception(caught.value))) <= 3500
 
 
-def test_record_values_are_masked() -> None:
-    error = matching_error("maxLength", "classification", {"labels": [{"label": HUGE}]})
+@pytest.mark.parametrize("check_formats", [True, False])
+def test_record_values_are_masked(check_formats: bool) -> None:
+    error = matching_error("maxLength", "classification", {"labels": [{"label": HUGE}]}, check_formats=check_formats)
     assert error.message == "… is longer than 128 characters"
 
 
-def test_long_property_names_are_cut() -> None:
-    error = matching_error("additionalProperties", "classification", {"labels": [], HUGE: 1})
+@pytest.mark.parametrize("check_formats", [True, False])
+def test_long_property_names_are_cut(check_formats: bool) -> None:
+    record = {"labels": [], HUGE: 1}
+    error = matching_error("additionalProperties", "classification", record, check_formats=check_formats)
     assert len(error.message) == 1000
     assert error.message.endswith("y…")
 
@@ -96,11 +108,12 @@ def reachable(root: object) -> list[object]:
     return found
 
 
-def test_errors_keep_neither_the_value_nor_the_jsonschema_rs_error() -> None:
+@pytest.mark.parametrize("check_formats", [True, False])
+def test_errors_keep_neither_the_value_nor_the_jsonschema_rs_error(check_formats: bool) -> None:
     record = {"labels": [{"label": HUGE}]}
     with pytest.raises(ValidationError) as caught:
-        validate(record, "classification")
-    errors = [caught.value, *iter_errors(record, "classification")]
+        validate(record, "classification", check_formats=check_formats)
+    errors = [caught.value, *iter_errors(record, "classification", check_formats=check_formats)]
     del caught
     gc.collect()
     assert not [obj for obj in gc.get_objects() if isinstance(obj, jsonschema_rs.ValidationError)]
@@ -166,6 +179,7 @@ def test_public_api_does_not_mention_jsonschema_rs() -> None:
             assert "jsonschema" not in str(inspect.signature(target)), target
     assert {name for name in dir(get_validator("classification")) if not name.startswith("_")} == {
         "is_valid",
+        "check_formats",
         "iter_errors",
         "schema",
         "schema_name",

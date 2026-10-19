@@ -87,6 +87,12 @@ validator.schema  # the schema, as a new dict
 errors = list(validator.iter_errors(record))
 ```
 
+**Format checking.** By default, a `uri` that isn't a URI, or a `date-time` that isn't an RFC 3339 timestamp, is an error. JSON Schema 2020-12 treats `format` as an annotation unless format checking is turned on, so other validators may accept records that oatschema rejects. To match them, or to keep accepting records you've accepted before, pass `check_formats=False` to `validate`, `is_valid`, `iter_errors` or `get_validator`:
+
+```python
+oatschema.is_valid(record, "classification", version="0.5.0", check_formats=False)
+```
+
 **Bring your own validator.** `get_schema` returns a plain dict for any JSON Schema 2020-12 validator. `x-license` and `x-version` are the only non-standard keywords, and 2020-12 validators ignore them. With [jsonschema](https://python-jsonschema.readthedocs.io):
 
 ```python
@@ -107,15 +113,16 @@ validator.is_valid({"labels": [{"label": "cat", "score": 0.92}]})  # True
 | `SCHEMA_VERSION` | The default schema version, the newest bundled |
 | `LEGACY_VERSIONS` | The bundled versions from before OATS: 0.4.0 to 0.6.0 |
 | `SchemaName` | The schema names, as a `Literal` |
-| `validate(record, name, version=None)` | Raises `ValidationError` for the first error found. Needs `[validate]` |
-| `is_valid(record, name, version=None)` | `True` or `False`. Needs `[validate]` |
-| `iter_errors(record, name, version=None)` | An iterator over every error, as `ValidationError`s. Needs `[validate]` |
-| `get_validator(name, version=None)` | The cached `Validator`. Needs `[validate]` |
-| `Validator` | `validate(record)`, `is_valid(record)` and `iter_errors(record)`, plus read-only `schema_name`, `schema_version` and `schema` |
+| `validate(record, name, version=None, *, check_formats=True)` | Raises `ValidationError` for the first error found. Needs `[validate]` |
+| `is_valid(record, name, version=None, *, check_formats=True)` | `True` or `False`. Needs `[validate]` |
+| `iter_errors(record, name, version=None, *, check_formats=True)` | An iterator over every error, as `ValidationError`s. Needs `[validate]` |
+| `get_validator(name, version=None, *, check_formats=True)` | The cached `Validator`. Needs `[validate]` |
+| `Validator` | `validate(record)`, `is_valid(record)` and `iter_errors(record)`, plus read-only `schema_name`, `schema_version`, `schema` and `check_formats` |
 | `ValidationError` | A `ValueError` with `message`, `schema_name`, `schema_version`, `path`, `schema_path` and `keyword` |
 
 - `version` must be exact: `"0.8.0"`, never `"0.8"` or `"latest"`.
 - A name that exists in no bundled version raises `ValueError`. A version that isn't bundled, or that lacks the schema, raises `LookupError`.
+- `check_formats=False` turns off checking of `format` (`date-time`, `uri`). It is keyword-only, and must be `True` or `False`.
 - Without the `validate` extra, the validation functions raise `ImportError`, naming the extra to install.
 
 ## Versions

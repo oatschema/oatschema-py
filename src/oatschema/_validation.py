@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 The OATS Authors
 # SPDX-License-Identifier: Apache-2.0
 
+import copyreg
 from collections.abc import Iterator
 from functools import lru_cache
 from typing import Any
@@ -43,33 +44,41 @@ class ValidationError(ValueError):
         location = _shorten("/".join(_shorten(str(part), _PATH_PART_LIMIT) for part in self.path), _MESSAGE_LIMIT)
         return f"{self.schema_name} {self.schema_version} at /{location}: {self.message}"
 
+    def __reduce__(self) -> tuple[Any, ...]:
+        return copyreg.__newobj__, (type(self), *self.args), vars(self)  # type: ignore[attr-defined]
+
 
 def _shorten(text: str, limit: int) -> str:
     return text if len(text) <= limit else f"{text[: limit - 1]}…"
 
 
 class Validator:
-    """A compiled validator for one schema version, with format assertions (``date-time``, ``uri``, …) enabled.
+    """A compiled validator for one schema version.
 
+    Formats (``date-time``, ``uri``, …) are checked unless ``check_formats`` is ``False``.
     Get one with ``get_validator``, which caches it. Requires the ``validate`` extra.
     """
 
-    __slots__ = ("_error_type", "_name", "_validator", "_version")
+    __slots__ = ("_check_formats", "_error_type", "_name", "_validator", "_version")
 
-    def __init__(self, name: SchemaName, version: str | None = None) -> None:
+    def __init__(self, name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> None:
+        if not isinstance(check_formats, bool):
+            raise TypeError(f"check_formats must be True or False, not {check_formats!r}")
         try:
             import jsonschema_rs
         except ImportError as error:
             raise ImportError("validation needs jsonschema-rs: pip install 'oatschema[validate]'") from error
         self._version = resolve(name, version)
         self._name = name
+        self._check_formats = check_formats
         self._validator = jsonschema_rs.validator_for(
-            get_schema(name, self._version), validate_formats=True, mask=_MASK
+            get_schema(name, self._version), validate_formats=check_formats, mask=_MASK
         )
         self._error_type = jsonschema_rs.ValidationError
 
     def __repr__(self) -> str:
-        return f"<oatschema.Validator {self._name} {self._version}>"
+        formats = "" if self._check_formats else " check_formats=False"
+        return f"<oatschema.Validator {self._name} {self._version}{formats}>"
 
     @property
     def schema_name(self) -> SchemaName:
@@ -80,6 +89,11 @@ class Validator:
     def schema_version(self) -> str:
         """The exact schema version."""
         return self._version
+
+    @property
+    def check_formats(self) -> bool:
+        """Whether formats (``date-time``, ``uri``, …) are checked."""
+        return self._check_formats
 
     @property
     def schema(self) -> dict[str, Any]:
@@ -122,54 +136,59 @@ class Validator:
         )
 
 
-@lru_cache(maxsize=None)
-def _validator(name: SchemaName, version: str) -> Validator:
-    return Validator(name, version)
+@lru_cache(maxsize=None, typed=True)
+def _validator(name: SchemaName, version: str, check_formats: bool) -> Validator:
+    return Validator(name, version, check_formats=check_formats)
 
 
-@lru_cache(maxsize=None)
-def _lookup(name: SchemaName, version: str | None) -> Validator:
-    return _validator(name, resolve(name, version))
+@lru_cache(maxsize=None, typed=True)
+def _lookup(name: SchemaName, version: str | None, check_formats: bool) -> Validator:
+    return _validator(name, resolve(name, version), check_formats)
 
 
-def get_validator(name: SchemaName, version: str | None = None) -> Validator:
+def get_validator(name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> Validator:
     """Return a cached ``Validator`` for the schema ``name`` in schema version ``version``.
 
-    ``version`` follows the same rules as in ``get_schema``. Requires the ``validate`` extra.
+    ``version`` follows the same rules as in ``get_schema``. Formats (``date-time``, ``uri``, …) are checked
+    unless ``check_formats`` is ``False``. Requires the ``validate`` extra.
 
     Raises:
         ImportError: ``jsonschema-rs`` is not installed.
         ValueError: ``name`` is not a schema in any bundled version.
         LookupError: ``version`` is not bundled, or does not contain ``name``.
+        TypeError: ``check_formats`` is not ``True`` or ``False``.
     """
-    return _lookup(name, version)
+    return _lookup(name, version, check_formats)
 
 
-def validate(record: Any, name: SchemaName, version: str | None = None) -> None:
+def validate(record: Any, name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> None:
     """Check ``record`` against the schema ``name`` in schema version ``version``, defaulting to ``SCHEMA_VERSION``.
 
     Raises ``ValidationError`` for the first error found; ``iter_errors`` returns every error.
     Before 1.0.0, a schema version may reject records that an older one accepted,
-    so pass the version a record was written for. Requires the ``validate`` extra.
+    so pass the version a record was written for. Formats (``date-time``, ``uri``, …) are checked
+    unless ``check_formats`` is ``False``. Requires the ``validate`` extra.
 
     Raises:
         ValidationError: ``record`` does not conform. Other errors are as for ``get_validator``.
     """
-    _lookup(name, version).validate(record)
+    _lookup(name, version, check_formats).validate(record)
 
 
-def is_valid(record: Any, name: SchemaName, version: str | None = None) -> bool:
+def is_valid(record: Any, name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> bool:
     """Return whether ``record`` conforms to the schema ``name`` in schema version ``version``.
 
     Arguments and errors are as for ``validate``, except that a non-conforming record returns ``False``.
     """
-    return _lookup(name, version).is_valid(record)
+    return _lookup(name, version, check_formats).is_valid(record)
 
 
-def iter_errors(record: Any, name: SchemaName, version: str | None = None) -> Iterator[ValidationError]:
+def iter_errors(
+    record: Any, name: SchemaName, version: str | None = None, *, check_formats: bool = True
+) -> Iterator[ValidationError]:
     """Return an iterator over every error in ``record`` against the schema ``name`` in schema version ``version``.
 
     Arguments and errors are as for ``validate``, except that each error is yielded rather than raised.
     The order is as described for ``Validator.iter_errors``.
     """
-    return _lookup(name, version).iter_errors(record)
+    return _lookup(name, version, check_formats).iter_errors(record)
