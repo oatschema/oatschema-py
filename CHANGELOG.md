@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0.1 (unreleased)
+## 0.8.0.1 (2026-10-19)
 
 No schema changes: the bundled schema versions are still 0.4.0 to 0.8.0.
 
