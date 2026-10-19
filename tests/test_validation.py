@@ -1,10 +1,13 @@
 # SPDX-FileCopyrightText: 2026 The OATS Authors
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import json
 import os
+import pickle
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast, get_args
 
@@ -55,6 +58,71 @@ def test_formats_are_asserted() -> None:
     assert not is_valid({"segments": [SEGMENT], "vocabulary_url": "not a uri"}, "temporal-segmentation")
 
 
+BAD_FORMATS = {"labels": [{"label": "cat", "score": 0.5, "timestamp": "not a date"}], "vocabulary_url": "not a uri"}
+
+
+@pytest.mark.parametrize("version", ["0.5.0", "0.8.0"])
+def test_format_checking_can_be_turned_off(version: str) -> None:
+    errors = list(iter_errors(BAD_FORMATS, "classification", version))
+    assert [(error.keyword, error.path) for error in errors] == [
+        ("format", ("labels", 0, "timestamp")),
+        ("format", ("vocabulary_url",)),
+    ]
+    assert not is_valid(BAD_FORMATS, "classification", version)
+    assert not get_validator("classification", version).is_valid(BAD_FORMATS)
+    with pytest.raises(ValidationError):
+        validate(BAD_FORMATS, "classification", version)
+
+    validate(BAD_FORMATS, "classification", version, check_formats=False)
+    assert is_valid(BAD_FORMATS, "classification", version, check_formats=False)
+    assert list(iter_errors(BAD_FORMATS, "classification", version, check_formats=False)) == []
+    unchecked = get_validator("classification", version, check_formats=False)
+    assert unchecked.is_valid(BAD_FORMATS)
+    assert Validator("classification", version, check_formats=False).is_valid(BAD_FORMATS)
+    assert not Validator("classification", version).is_valid(BAD_FORMATS)
+
+
+def test_check_formats_is_part_of_the_cache_key() -> None:
+    checked = get_validator("classification", "0.5.0")
+    unchecked = get_validator("classification", "0.5.0", check_formats=False)
+    assert checked is not unchecked
+    assert checked is get_validator("classification", "0.5.0", check_formats=True)
+    assert unchecked is get_validator("classification", "0.5.0", check_formats=False)
+    assert (checked.check_formats, unchecked.check_formats) == (True, False)
+    assert repr(checked) == "<oatschema.Validator classification 0.5.0>"
+    assert repr(unchecked) == "<oatschema.Validator classification 0.5.0 check_formats=False>"
+
+
+@pytest.mark.parametrize("value", [None, 0, 1, "no"])
+def test_check_formats_must_be_a_bool(value: Any) -> None:
+    get_validator("classification", "0.5.0")
+    get_validator("classification", "0.5.0", check_formats=False)
+    calls: list[Callable[[], object]] = [
+        lambda: get_validator("classification", "0.5.0", check_formats=value),
+        lambda: Validator("classification", "0.5.0", check_formats=value),
+        lambda: validate({}, "classification", "0.5.0", check_formats=value),
+        lambda: is_valid({}, "classification", "0.5.0", check_formats=value),
+        lambda: iter_errors({}, "classification", "0.5.0", check_formats=value),
+    ]
+    for call in calls:
+        with pytest.raises(TypeError, match="check_formats must be True or False"):
+            call()
+
+
+def test_validation_error_can_be_pickled_and_copied() -> None:
+    record = {"segments": [{**SEGMENT, "start_time": -1}]}
+    with pytest.raises(ValidationError) as caught:
+        validate(record, "temporal-segmentation")
+    error = caught.value
+    error.add_note("a note")
+    copies = [pickle.loads(pickle.dumps(error, protocol)) for protocol in range(pickle.HIGHEST_PROTOCOL + 1)]
+    for clone in [*copies, copy.copy(error), copy.deepcopy(error)]:
+        assert type(clone) is ValidationError
+        assert clone.args == error.args
+        assert vars(clone) == vars(error)
+        assert str(clone) == str(error)
+
+
 def test_version_selects_schema() -> None:
     record = {"segments": [SEGMENT]}
     with pytest.raises(LookupError):
@@ -80,7 +148,7 @@ def test_validator_is_package_owned() -> None:
     assert schema == oatschema.get_schema("classification", "0.6.0")
     schema["mutated"] = True
     assert "mutated" not in validator.schema
-    for attribute in ("schema_name", "schema_version", "schema"):
+    for attribute in ("schema_name", "schema_version", "schema", "check_formats"):
         with pytest.raises(AttributeError):
             setattr(validator, attribute, None)
     with pytest.raises(AttributeError):
