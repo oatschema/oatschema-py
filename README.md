@@ -25,7 +25,7 @@ import oatschema
 
 oatschema.validate({"labels": [{"label": "cat", "score": 0.92}]}, "classification")  # passes
 oatschema.validate({"labels": [{"label": "cat", "score": 1.5}]}, "classification")
-# oatschema.ValidationError: classification 0.8.0 at /labels/0/score: 1.5 is greater than the maximum of 1
+# oatschema.ValidationError: classification 0.8.0 at /labels/0/score: … is greater than the maximum of 1
 
 schema = oatschema.get_schema("classification")  # a fresh dict, safe to modify
 schema["$id"]  # "https://oatschema.org/0.8.0/classification"
@@ -55,7 +55,7 @@ Browse every schema, its fields and the changelog at [oatschema.org](https://oat
 
 ## Validating records
 
-`validate` raises `oatschema.ValidationError`, and `is_valid` returns a bool. Both use a cached [jsonschema-rs](https://github.com/Stranger6667/jsonschema) validator that also checks formats such as `uri` and `date-time`. `get_validator` returns that validator, for when you want its full API.
+`validate` raises `oatschema.ValidationError`, `is_valid` returns a bool, and `iter_errors` returns every error. All three use a cached [jsonschema-rs](https://github.com/Stranger6667/jsonschema) validator that also checks formats such as `uri` and `date-time`. You never need jsonschema-rs's own API or types.
 
 ```python
 try:
@@ -63,10 +63,29 @@ try:
 except oatschema.ValidationError as error:
     error.path  # ("labels", 0, "score"): where in the record
     error.schema_path  # ("properties", "labels", ..., "maximum"): which rule failed
+    error.keyword  # "maximum": the last keyword in schema_path
     error.schema_name, error.schema_version  # "classification", "0.8.0"
+    error.message  # "… is greater than the maximum of 1"
+
+for error in oatschema.iter_errors(record, "classification"):
+    print(error)
 ```
 
-`ValidationError` is a `ValueError`, and reports the first error it finds. The jsonschema-rs error is attached as its `__cause__`, so your code never needs to import jsonschema-rs error types.
+`ValidationError` is a `ValueError`. `validate` raises the first error it finds, and stops there. `iter_errors` yields every error as a `ValidationError`.
+
+- jsonschema-rs finds every error before `iter_errors` yields the first, so use `validate` when one error is enough.
+- The order of errors is jsonschema-rs's: a record gives the same order each time with the same jsonschema-rs version, but the order may change between versions. The error `validate` raises is not always the first one `iter_errors` yields.
+
+**Errors stay small, however large the record.** Messages show values from the record as `…` (`… is longer than 128 characters`), and are at most about 1 KB. Only property names are quoted, and cut to fit. `error.path` says where the value is. `str()` also shortens long property names in the path, but `error.path` keeps them in full. The jsonschema-rs error is not attached, nor is the failing value, so logging or printing a traceback never dumps the record.
+
+**One validator, many records.** `get_validator` returns a cached `oatschema.Validator`, with the same `validate`, `is_valid` and `iter_errors` methods, without a schema name or version on every call:
+
+```python
+validator = oatschema.get_validator("classification", "0.7.0")
+validator.schema_name, validator.schema_version  # "classification", "0.7.0"
+validator.schema  # the schema, as a new dict
+errors = list(validator.iter_errors(record))
+```
 
 **Bring your own validator.** `get_schema` returns a plain dict for any JSON Schema 2020-12 validator. `x-license` and `x-version` are the only non-standard keywords, and 2020-12 validators ignore them. With [jsonschema](https://python-jsonschema.readthedocs.io):
 
@@ -88,10 +107,12 @@ validator.is_valid({"labels": [{"label": "cat", "score": 0.92}]})  # True
 | `SCHEMA_VERSION` | The default schema version, the newest bundled |
 | `LEGACY_VERSIONS` | The bundled versions from before OATS: 0.4.0 to 0.6.0 |
 | `SchemaName` | The schema names, as a `Literal` |
-| `validate(record, name, version=None)` | Raises `ValidationError` if `record` doesn't conform. Needs `[validate]` |
+| `validate(record, name, version=None)` | Raises `ValidationError` for the first error found. Needs `[validate]` |
 | `is_valid(record, name, version=None)` | `True` or `False`. Needs `[validate]` |
-| `get_validator(name, version=None)` | The cached `jsonschema_rs` validator. Needs `[validate]` |
-| `ValidationError` | A `ValueError` with `schema_name`, `schema_version`, `path` and `schema_path` |
+| `iter_errors(record, name, version=None)` | An iterator over every error, as `ValidationError`s. Needs `[validate]` |
+| `get_validator(name, version=None)` | The cached `Validator`. Needs `[validate]` |
+| `Validator` | `validate(record)`, `is_valid(record)` and `iter_errors(record)`, plus read-only `schema_name`, `schema_version` and `schema` |
+| `ValidationError` | A `ValueError` with `message`, `schema_name`, `schema_version`, `path`, `schema_path` and `keyword` |
 
 - `version` must be exact: `"0.8.0"`, never `"0.8"` or `"latest"`.
 - A name that exists in no bundled version raises `ValueError`. A version that isn't bundled, or that lacks the schema, raises `LookupError`.
