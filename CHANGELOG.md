@@ -8,7 +8,8 @@ No schema changes: the bundled schema versions are still 0.4.0 to 0.8.0.
 
 - `oatschema.Validator` has `validate(record)`, `is_valid(record)` and `iter_errors(record)`, and read-only `schema_name`, `schema_version` and `schema`. No jsonschema-rs type appears in the public API.
 - New `iter_errors(record, name, version=None)` returns every error, as `ValidationError`s. `validate` still raises one error: the first it finds.
-- Error messages are now short, whatever the size of the record. Instead of quoting the whole failing value, a message shows a preview of at most about 100 characters, and is at most about 1 KB. Before, a multi-megabyte string was copied into the message and the traceback, more than once.
+- Error messages are now short, whatever the size of the record. Values from the record appear as `…` (`… is longer than 128 characters`), and a message is at most about 1 KB. Before, a multi-megabyte string was copied into the message and the traceback, more than once.
+- Failing records are faster to report: about 35 µs instead of about 300 µs for a record with a 200,000-character value.
 - `ValidationError` no longer chains the jsonschema-rs error as `__cause__`, and keeps no reference to the failing value. It has a new `keyword` attribute, the last keyword in `schema_path` (for example `"maxLength"`). Message wording has changed.
 - `validate` and `is_valid` are faster on small records, because the schema name and version are looked up once and cached.
 

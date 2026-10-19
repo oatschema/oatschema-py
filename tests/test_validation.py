@@ -47,7 +47,7 @@ def test_invalid_record_raises_package_error() -> None:
     assert error.path == ("segments", 0, "start_time")
     assert error.schema_path[-1] == "minimum"
     assert error.keyword == "minimum"
-    assert error.message == "-1 is less than the minimum of 0"
+    assert error.message == "… is less than the minimum of 0"
     assert str(error).startswith(f"temporal-segmentation {SCHEMA_VERSION} at /segments/0/start_time: ")
 
 

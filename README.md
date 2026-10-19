@@ -25,7 +25,7 @@ import oatschema
 
 oatschema.validate({"labels": [{"label": "cat", "score": 0.92}]}, "classification")  # passes
 oatschema.validate({"labels": [{"label": "cat", "score": 1.5}]}, "classification")
-# oatschema.ValidationError: classification 0.8.0 at /labels/0/score: 1.5 is greater than the maximum of 1
+# oatschema.ValidationError: classification 0.8.0 at /labels/0/score: … is greater than the maximum of 1
 
 schema = oatschema.get_schema("classification")  # a fresh dict, safe to modify
 schema["$id"]  # "https://oatschema.org/0.8.0/classification"
@@ -65,7 +65,7 @@ except oatschema.ValidationError as error:
     error.schema_path  # ("properties", "labels", ..., "maximum"): which rule failed
     error.keyword  # "maximum": the last keyword in schema_path
     error.schema_name, error.schema_version  # "classification", "0.8.0"
-    error.message  # "1.5 is greater than the maximum of 1"
+    error.message  # "… is greater than the maximum of 1"
 
 for error in oatschema.iter_errors(record, "classification"):
     print(error)
@@ -76,7 +76,7 @@ for error in oatschema.iter_errors(record, "classification"):
 - jsonschema-rs finds every error before `iter_errors` yields the first, so use `validate` when one error is enough.
 - The order of errors is jsonschema-rs's: a record gives the same order each time with the same jsonschema-rs version, but the order may change between versions. The error `validate` raises is not always the first one `iter_errors` yields.
 
-**Errors stay small, however large the record.** Messages never quote more than a short preview of the record. A long string is cut to about 100 characters, followed by its length (`"yyyy…" (5,000,000 characters) is longer than 128 characters`), and an array or object is described by its size. A message is at most about 1 KB. `str()` also shortens long property names in the path, but `error.path` keeps them in full. The jsonschema-rs error is not attached, nor is the failing value, so logging or printing a traceback never dumps the record.
+**Errors stay small, however large the record.** Messages show values from the record as `…` (`… is longer than 128 characters`), and are at most about 1 KB. Only property names are quoted, and cut to fit. `error.path` says where the value is. `str()` also shortens long property names in the path, but `error.path` keeps them in full. The jsonschema-rs error is not attached, nor is the failing value, so logging or printing a traceback never dumps the record.
 
 **One validator, many records.** `get_validator` returns a cached `oatschema.Validator`, with the same `validate`, `is_valid` and `iter_errors` methods, without a schema name or version on every call:
 
