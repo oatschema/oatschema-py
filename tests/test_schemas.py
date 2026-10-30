@@ -153,3 +153,22 @@ def test_json_mode_reports_name_and_version_errors() -> None:
         get_schema("nope", mode="json")  # type: ignore[call-overload]
     with pytest.raises(LookupError):
         get_schema("classification", "0.7", mode="json")
+
+
+@pytest.mark.parametrize("name", [None, 1, b"classification", {"labels": []}, ["classification"]])
+def test_get_schema_rejects_a_non_str_name(name: Any) -> None:
+    with pytest.raises(TypeError, match=r"the schema name must be a str, .*expected get_schema\(name, version=None"):
+        get_schema(name)
+
+
+@pytest.mark.parametrize("version", [8, 0.8, b"0.8.0", ["0.8.0"], {"version": "0.8.0"}])
+@pytest.mark.parametrize("mode", ["dict", "json"])
+def test_get_schema_rejects_a_non_str_version(version: Any, mode: Any) -> None:
+    with pytest.raises(TypeError, match=r"version must be a str .*expected get_schema\(name, version=None"):
+        get_schema("classification", version, mode=mode)
+
+
+@pytest.mark.parametrize("mode", [1, None, b"json", ["json"]])
+def test_get_schema_rejects_a_non_str_mode(mode: Any) -> None:
+    with pytest.raises(TypeError, match=r"mode must be 'dict' or 'json'.*expected get_schema\(name"):
+        get_schema("classification", mode=mode)

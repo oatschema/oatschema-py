@@ -65,6 +65,16 @@ def available_versions() -> list[str]:
     return list(_bundled())
 
 
+def check_arguments(call: str, name: object, version: object) -> None:
+    """Raise ``TypeError``, naming ``call``, unless ``name`` is a str and ``version`` is a str or ``None``."""
+    if not isinstance(name, str):
+        raise TypeError(f"the schema name must be a str, not {type(name).__name__}; expected {call}")
+    if version is not None and not isinstance(version, str):
+        raise TypeError(
+            f"version must be a str such as '0.8.0', or None, not {type(version).__name__}; expected {call}"
+        )
+
+
 def resolve(name: str, version: str | None) -> str:
     """Return the exact version ``get_schema(name, version)`` would read, after checking that it exists."""
     resolved = SCHEMA_VERSION if version is None else version
@@ -91,9 +101,14 @@ def get_schema(name: SchemaName, version: str | None = None, *, mode: Literal["d
     ``version`` must be an exact bundled version such as ``"0.8.0"``; partial versions and aliases are not accepted.
 
     Raises:
+        TypeError: ``name`` or ``mode`` is not a str, or ``version`` is neither a str nor ``None``.
         ValueError: ``name`` is not a schema in any bundled version, or ``mode`` is not ``"dict"`` or ``"json"``.
         LookupError: ``version`` is not bundled, or does not contain ``name``.
     """
+    call = "get_schema(name, version=None, *, mode='dict')"
+    check_arguments(call, name, version)
+    if not isinstance(mode, str):
+        raise TypeError(f"mode must be 'dict' or 'json', not {type(mode).__name__}; expected {call}")
     if mode not in ("dict", "json"):
         raise ValueError(f"mode must be 'dict' or 'json', not {mode!r}")
     data = _read(name, resolve(name, version))

@@ -46,7 +46,27 @@ The tests check that these agree with the bundled files.
 
 ## Releasing
 
-A maintainer builds and publishes each release by hand, with `uv build` and then `uv publish`. CI only runs the checks and never publishes.
+A maintainer builds and publishes each release by hand. CI only runs the checks and never publishes.
+
+1. In a pull request, set `__version__` in `src/oatschema/__init__.py`, and give the CHANGELOG entry its heading with the release date: `## <version> (YYYY-MM-DD)`. The entry says whether anything breaks; see "API changes" in the README.
+2. Merge it once CI passes.
+3. Tag the merge commit on `main` with an annotated tag, and push the tag:
+
+   ```
+   git switch main && git pull
+   git tag -a v<version> -m "oatschema <version>"
+   git push origin v<version>
+   ```
+
+4. Build and publish from that commit, with a clean working tree:
+
+   ```
+   rm -rf dist
+   uv build
+   uv publish
+   ```
+
+5. Create a GitHub Release from the tag, with the CHANGELOG entry as its notes.
 
 ## Licensing and sign-off
 
