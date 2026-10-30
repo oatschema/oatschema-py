@@ -6,7 +6,7 @@
 from oatschema._schemas import LEGACY_VERSIONS, SCHEMA_VERSION, SchemaName, available_versions, get_schema
 from oatschema._validation import ValidationError, Validator, get_validator, is_valid, iter_errors, validate
 
-__version__ = "0.8.0.1"
+__version__ = "0.8.0.2"
 
 __all__ = [
     "LEGACY_VERSIONS",

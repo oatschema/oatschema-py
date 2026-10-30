@@ -6,11 +6,13 @@ from collections.abc import Iterator
 from functools import lru_cache
 from typing import Any
 
-from oatschema._schemas import SchemaName, get_schema, resolve
+from oatschema._schemas import SchemaName, check_arguments, get_schema, resolve
 
 _MASK = "…"
 _PATH_PART_LIMIT = 100
 _MESSAGE_LIMIT = 1000
+_VALIDATOR_CALL = "{}(name, version=None, *, check_formats=True)"
+_RECORD_CALL = "{}(record, name, version=None, *, check_formats=True)"
 
 
 class ValidationError(ValueError):
@@ -22,6 +24,8 @@ class ValidationError(ValueError):
     ``message`` shows each value from the record as ``…``, quoting only property names, and is at most about 1 KB.
     ``str()`` also shortens long parts of ``path``. The underlying validator's error is not kept.
     """
+
+    __module__ = "oatschema"
 
     def __init__(
         self,
@@ -52,6 +56,31 @@ def _shorten(text: str, limit: int) -> str:
     return text if len(text) <= limit else f"{text[: limit - 1]}…"
 
 
+def _check_formats(check_formats: object, call: str) -> None:
+    if not isinstance(check_formats, bool):
+        raise TypeError(f"check_formats must be True or False, not {check_formats!r}; expected {call}")
+
+
+def _check_validator_call(function: str, name: object, version: object, check_formats: object) -> None:
+    call = _VALIDATOR_CALL.format(function)
+    check_arguments(call, name, version)
+    _check_formats(check_formats, call)
+
+
+def _check_record_call(function: str, record: object, name: object, version: object, check_formats: object) -> None:
+    call = _RECORD_CALL.format(function)
+    if isinstance(record, str) and not isinstance(name, str):
+        raise TypeError(f"{function}() takes the record first, then the schema name; expected {call}")
+    check_arguments(call, name, version)
+    _check_formats(check_formats, call)
+
+
+def _not_json(error: ValueError) -> TypeError:
+    return TypeError(
+        f"the record must be JSON data (dict, list, str, int, float, bool or None): {_shorten(str(error), 200)}"
+    )
+
+
 class Validator:
     """A compiled validator for one schema version.
 
@@ -59,11 +88,11 @@ class Validator:
     Get one with ``get_validator``, which caches it. Requires the ``validate`` extra.
     """
 
+    __module__ = "oatschema"
     __slots__ = ("_check_formats", "_error_type", "_name", "_validator", "_version")
 
     def __init__(self, name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> None:
-        if not isinstance(check_formats, bool):
-            raise TypeError(f"check_formats must be True or False, not {check_formats!r}")
+        _check_validator_call("Validator", name, version, check_formats)
         try:
             import jsonschema_rs
         except ImportError as error:
@@ -101,18 +130,29 @@ class Validator:
         return get_schema(self._name, self._version)
 
     def is_valid(self, record: Any) -> bool:
-        """Return whether ``record`` conforms."""
-        return self._validator.is_valid(record)
+        """Return whether ``record`` conforms.
+
+        Raises ``TypeError`` if ``record`` is not JSON data, such as a set or a dict with non-str keys.
+        """
+        try:
+            return self._validator.is_valid(record)
+        except ValueError as error:
+            failure = _not_json(error)
+        raise failure
 
     def validate(self, record: Any) -> None:
         """Raise ``ValidationError`` for an error in ``record``, if there is one.
 
         It stops at the first error jsonschema-rs finds, which is not always the first ``iter_errors`` yields.
+        Raises ``TypeError`` if ``record`` is not JSON data, as ``is_valid`` does.
         """
+        failure: Exception
         try:
             self._validator.validate(record)
         except self._error_type as error:
             failure = self._convert(error)
+        except ValueError as error:
+            failure = _not_json(error)
         else:
             return
         raise failure
@@ -122,9 +162,16 @@ class Validator:
 
         jsonschema-rs finds every error before the first is yielded, so use ``validate`` when one error is enough.
         The order is jsonschema-rs's: the same record gives the same order with the same jsonschema-rs version,
-        but it may change between jsonschema-rs versions.
+        but it may change between jsonschema-rs versions. Raises ``TypeError`` if ``record`` is not JSON data,
+        as ``is_valid`` does.
         """
-        return map(self._convert, self._validator.iter_errors(record))
+        try:
+            errors = self._validator.iter_errors(record)
+        except ValueError as error:
+            failure = _not_json(error)
+        else:
+            return map(self._convert, errors)
+        raise failure
 
     def _convert(self, error: Any) -> ValidationError:
         return ValidationError(
@@ -156,8 +203,10 @@ def get_validator(name: SchemaName, version: str | None = None, *, check_formats
         ImportError: ``jsonschema-rs`` is not installed.
         ValueError: ``name`` is not a schema in any bundled version.
         LookupError: ``version`` is not bundled, or does not contain ``name``.
-        TypeError: ``check_formats`` is not ``True`` or ``False``.
+        TypeError: ``name`` is not a str, ``version`` is neither a str nor ``None``,
+            or ``check_formats`` is not ``True`` or ``False``.
     """
+    _check_validator_call("get_validator", name, version, check_formats)
     return _lookup(name, version, check_formats)
 
 
@@ -170,8 +219,10 @@ def validate(record: Any, name: SchemaName, version: str | None = None, *, check
     unless ``check_formats`` is ``False``. Requires the ``validate`` extra.
 
     Raises:
-        ValidationError: ``record`` does not conform. Other errors are as for ``get_validator``.
+        ValidationError: ``record`` does not conform. Other errors are as for ``get_validator``,
+            and a ``TypeError`` for a str record with a non-str ``name`` says the arguments are swapped.
     """
+    _check_record_call("validate", record, name, version, check_formats)
     _lookup(name, version, check_formats).validate(record)
 
 
@@ -180,6 +231,7 @@ def is_valid(record: Any, name: SchemaName, version: str | None = None, *, check
 
     Arguments and errors are as for ``validate``, except that a non-conforming record returns ``False``.
     """
+    _check_record_call("is_valid", record, name, version, check_formats)
     return _lookup(name, version, check_formats).is_valid(record)
 
 
@@ -191,4 +243,5 @@ def iter_errors(
     Arguments and errors are as for ``validate``, except that each error is yielded rather than raised.
     The order is as described for ``Validator.iter_errors``.
     """
+    _check_record_call("iter_errors", record, name, version, check_formats)
     return _lookup(name, version, check_formats).iter_errors(record)

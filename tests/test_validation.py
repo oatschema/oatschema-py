@@ -251,3 +251,203 @@ def test_validation_api_is_exported() -> None:
     assert {"ValidationError", "Validator", "get_validator", "is_valid", "iter_errors", "validate"} <= set(
         oatschema.__all__
     )
+
+
+RECORD = {"labels": [{"label": "cat", "score": 0.5}]}
+RECORD_CALLS: list[Callable[..., Any]] = [validate, is_valid, iter_errors]
+VALIDATOR_CALLS: list[Callable[..., Any]] = [get_validator, Validator]
+
+
+@pytest.mark.parametrize("call", RECORD_CALLS)
+@pytest.mark.parametrize("record", [RECORD, [RECORD], b"{}"])
+def test_swapped_arguments_name_the_expected_order(call: Callable[..., Any], record: Any) -> None:
+    with pytest.raises(TypeError, match=rf"{call.__name__}\(\) takes the record first, then the schema name"):
+        call("classification", record)
+    with pytest.raises(TypeError, match=rf"{call.__name__}\(\) takes the record first"):
+        call("classification", record, "0.8.0", check_formats=False)
+
+
+@pytest.mark.parametrize("call", RECORD_CALLS)
+@pytest.mark.parametrize("name", [None, 1, b"classification", ["classification"], {"name": "classification"}])
+def test_record_calls_reject_a_non_str_name(call: Callable[..., Any], name: Any) -> None:
+    expected = rf"expected {call.__name__}\(record, name, version=None, \*, check_formats=True\)"
+    with pytest.raises(TypeError, match=rf"the schema name must be a str, not {type(name).__name__}; {expected}"):
+        call(RECORD, name)
+
+
+@pytest.mark.parametrize("call", RECORD_CALLS)
+@pytest.mark.parametrize("version", [8, 0.8, b"0.8.0", ("0", "8", "0"), {"version": "0.8.0"}])
+def test_record_calls_reject_a_non_str_version(call: Callable[..., Any], version: Any) -> None:
+    with pytest.raises(TypeError, match=rf"version must be a str .*; expected {call.__name__}\(record, name"):
+        call(RECORD, "classification", version)
+
+
+@pytest.mark.parametrize("call", VALIDATOR_CALLS)
+@pytest.mark.parametrize(
+    ("name", "version"), [(RECORD, None), (1, None), ("classification", 8), ("classification", [])]
+)
+def test_validator_calls_reject_wrong_types(call: Callable[..., Any], name: Any, version: Any) -> None:
+    with pytest.raises(TypeError, match=rf"expected {call.__name__}\(name, version=None, \*, check_formats=True\)"):
+        call(name, version)
+
+
+@pytest.mark.parametrize("value", [[], {}, {"x": 1}])
+def test_unhashable_check_formats_is_a_type_error(value: Any) -> None:
+    calls: list[Callable[[], object]] = [
+        lambda: get_validator("classification", check_formats=value),
+        lambda: Validator("classification", check_formats=value),
+        lambda: validate({}, "classification", check_formats=value),
+        lambda: is_valid({}, "classification", check_formats=value),
+        lambda: iter_errors({}, "classification", check_formats=value),
+    ]
+    for call in calls:
+        with pytest.raises(TypeError, match="check_formats must be True or False"):
+            call()
+
+
+def test_argument_types_are_checked_before_the_caches() -> None:
+    from oatschema import _validation
+
+    _validation._lookup.cache_clear()
+    _validation._validator.cache_clear()
+    record: Any = RECORD
+    calls: list[Callable[[], object]] = [
+        lambda: validate("classification", record),
+        lambda: is_valid(record, "classification", cast(Any, 8)),
+        lambda: iter_errors(record, "classification", check_formats=cast(Any, None)),
+        lambda: get_validator(record),
+    ]
+    for call in calls:
+        with pytest.raises(TypeError):
+            call()
+    assert _validation._lookup.cache_info().currsize == 0
+    assert _validation._validator.cache_info().currsize == 0
+
+
+@pytest.mark.parametrize("record", [[], None, "classification", 1, 1.5, True, [RECORD]])
+def test_non_object_records_are_still_reported_as_invalid(record: Any) -> None:
+    assert not is_valid(record, "classification")
+    with pytest.raises(ValidationError, match="is not of type"):
+        validate(record, "classification")
+    assert [error.keyword for error in iter_errors(record, "classification")] == ["type"]
+    assert not get_validator("classification").is_valid(record)
+
+
+def test_wrong_types_are_reported_without_the_validate_extra() -> None:
+    script = """
+import sys
+sys.modules["jsonschema_rs"] = None
+import oatschema
+for call, args in [
+    (oatschema.validate, ("classification", {})),
+    (oatschema.is_valid, ({}, 1)),
+    (oatschema.iter_errors, ({}, "classification", 8)),
+    (oatschema.get_validator, ({},)),
+    (oatschema.Validator, ("classification", 8)),
+]:
+    try:
+        call(*args)
+    except TypeError:
+        pass
+    else:
+        raise AssertionError(f"{call.__name__} did not raise TypeError")
+"""
+    subprocess.run([sys.executable, "-c", script], check=True)
+
+
+@pytest.mark.parametrize("cls", [ValidationError, Validator])
+def test_public_classes_belong_to_the_package(cls: type) -> None:
+    assert cls.__module__ == "oatschema"
+    assert getattr(oatschema, cls.__qualname__) is cls
+
+
+def test_validation_error_reads_as_package_class() -> None:
+    with pytest.raises(ValidationError) as caught:
+        validate({"labels": [{"label": "cat", "score": 1.5}]}, "classification")
+    error = caught.value
+    assert repr(error).startswith("ValidationError(")
+    assert caught.exconly().startswith("oatschema.ValidationError: classification 0.8.0 at /labels/0/score: ")
+    for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+        data = pickle.dumps(error, protocol)
+        assert b"oatschema._validation" not in data
+        clone = pickle.loads(data)
+        assert type(clone) is ValidationError
+        assert clone.args == error.args
+        assert vars(clone) == vars(error)
+        assert (clone.message, clone.schema_name, clone.schema_version) == (
+            error.message,
+            error.schema_name,
+            error.schema_version,
+        )
+        assert (clone.path, clone.schema_path, clone.keyword) == (error.path, error.schema_path, error.keyword)
+
+
+def test_uncaught_validation_error_traceback_names_the_package() -> None:
+    script = "import oatschema; oatschema.validate({'labels': [{'label': 'cat', 'score': 1.5}]}, 'classification')"
+    result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True)
+    assert result.returncode == 1
+    last = result.stderr.strip().splitlines()[-1]
+    assert last.startswith("oatschema.ValidationError: classification 0.8.0 at /labels/0/score: "), last
+
+
+def test_swapped_arguments_traceback_is_a_clear_type_error() -> None:
+    script = "import oatschema; oatschema.is_valid('classification', {'labels': []})"
+    result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True)
+    last = result.stderr.strip().splitlines()[-1]
+    assert last == (
+        "TypeError: is_valid() takes the record first, then the schema name; "
+        "expected is_valid(record, name, version=None, *, check_formats=True)"
+    ), last
+
+
+PICKLED_BY_0_8_0_1 = (
+    b"\x80\x04\x95\x17\x01\x00\x00\x00\x00\x00\x00\x8c\x15oatschema._validation\x94\x8c\x0fVal"
+    b"idationError\x94\x93\x94\x8c$\xe2\x80\xa6 is greater than the"
+    b" maximum of 1\x94\x85\x94\x81\x94}\x94(\x8c\x07message\x94h\x03\x8c\x0bschem"
+    b"a_name\x94\x8c\x0eclassification\x94\x8c\x0eschema_version"
+    b"\x94\x8c\x050.8.0\x94\x8c\x04path\x94\x8c\x06labels\x94K\x00\x8c\x05score\x94\x87\x94\x8c\x0bs"
+    b"chema_path\x94(\x8c\nproperties\x94\x8c\x06labels\x94\x8c\x05item"
+    b"s\x94\x8c\nproperties\x94\x8c\x05score\x94\x8c\x07maximum\x94t\x94\x8c\x07key"
+    b"word\x94h\x16ub."
+)
+
+
+def test_errors_pickled_by_0_8_0_1_still_load() -> None:
+    assert b"oatschema._validation" in PICKLED_BY_0_8_0_1
+    error = pickle.loads(PICKLED_BY_0_8_0_1)
+    assert type(error) is ValidationError
+    assert vars(error) == {
+        "message": "… is greater than the maximum of 1",
+        "schema_name": "classification",
+        "schema_version": "0.8.0",
+        "path": ("labels", 0, "score"),
+        "schema_path": ("properties", "labels", "items", "properties", "score", "maximum"),
+        "keyword": "maximum",
+    }
+
+
+NOT_JSON = [{1, 2}, object(), {1: "a"}, {"labels": [{"label": b"cat"}]}, {"labels": [{"label": "cat", "score": 1j}]}]
+
+
+@pytest.mark.parametrize("record", NOT_JSON)
+def test_records_that_are_not_json_raise_type_error(record: Any) -> None:
+    validator = get_validator("classification")
+    calls: list[Callable[[], object]] = [
+        lambda: validate(record, "classification"),
+        lambda: is_valid(record, "classification"),
+        lambda: iter_errors(record, "classification"),
+        lambda: validator.validate(record),
+        lambda: validator.is_valid(record),
+        lambda: validator.iter_errors(record),
+    ]
+    for call in calls:
+        with pytest.raises(TypeError, match="the record must be JSON data") as caught:
+            call()
+        assert caught.value.__cause__ is None
+        assert not isinstance(caught.value, ValueError)
+
+
+@pytest.mark.parametrize("call", RECORD_CALLS)
+def test_check_formats_error_names_the_expected_call(call: Callable[..., Any]) -> None:
+    with pytest.raises(TypeError, match=rf"; expected {call.__name__}\(record, name, version=None"):
+        call(RECORD, "classification", check_formats=1)

@@ -123,6 +123,7 @@ validator.is_valid({"labels": [{"label": "cat", "score": 0.92}]})  # True
 - `version` must be exact: `"0.8.0"`, never `"0.8"` or `"latest"`.
 - A name that exists in no bundled version raises `ValueError`. A version that isn't bundled, or that lacks the schema, raises `LookupError`.
 - `check_formats=False` turns off checking of `format` (`date-time`, `uri`). It is keyword-only, and must be `True` or `False`.
+- Arguments of the wrong type raise `TypeError`, naming the expected call: a name that isn't a str, a version that is neither a str nor `None`, or a record that isn't JSON data (a set, an arbitrary object, a dict with non-str keys). So does a record passed after the schema name, as in `validate(name, record)`, which should be `validate(record, name)`. A record that is JSON data but not an object, such as a list or `None`, is reported as invalid, not as a `TypeError`.
 - Without the `validate` extra, the validation functions raise `ImportError`, naming the extra to install.
 
 ## Versions
@@ -143,7 +144,20 @@ oatschema.is_valid({"labels": []}, "classification")  # True: from 0.8.0 an empt
 - `a.b.c` is the newest bundled schema version, equal to `SCHEMA_VERSION`;
 - `d` is the package's own revision, for fixes and features that add no schema version. It is left out when it is 0, so `0.8.0` is followed by `0.8.0.1`, `0.8.0.2`, and so on.
 
-Upgrading never removes a schema version, but it does move the default `SCHEMA_VERSION`. Before 1.0, pin with `oatschema~=0.8.0`, because a new schema minor version may change which records are valid. From 1.0, use `oatschema>=1.3,<2`.
+Upgrading never removes a schema version, but a new schema version moves the default `SCHEMA_VERSION`.
+
+**API changes.**
+
+- Before OATS 1.0, breaking API changes come only with a new schema minor version, such as `0.9.0.0`. Releases that change only `d` are for fixes and additions. This is a goal rather than a guarantee: if a `d` release ever has to break something, its CHANGELOG entry says so.
+- From OATS 1.0, breaking API changes wait for a new schema major version, `2.0.0.0`.
+
+**Pinning.** Allow every release up to the next schema minor version, from the release whose features you use:
+
+```
+oatschema[validate]>=0.8.0.1,<0.9
+```
+
+From OATS 1.0, allow every release up to the next major version instead, for example `oatschema[validate]>=1.3,<2`.
 
 ## Contributing
 

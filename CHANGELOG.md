@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.0.2 (2026-10-30)
+
+No schema changes: the bundled schema versions are still 0.4.0 to 0.8.0. Nothing breaks: every call whose arguments have the documented types behaves as in 0.8.0.1.
+
+- Arguments of the wrong type raise a `TypeError` that names the expected call, before any lookup, in `get_schema`, `get_validator`, `Validator`, `validate`, `is_valid` and `iter_errors`. Swapping the record and the schema name, as in `is_valid("classification", record)`, raises `TypeError: is_valid() takes the record first, then the schema name; expected is_valid(record, name, version=None, *, check_formats=True)`. Before, it raised `TypeError: unhashable type: 'dict'` from inside the package.
+- The same goes for a schema name that isn't a str, a version that is neither a str nor `None`, a `check_formats` that isn't a bool, and a `get_schema` `mode` that isn't a str. Before, these raised `ValueError`, `LookupError` or an unrelated `TypeError`, depending on the value. Catch `TypeError` if you pass names or versions you haven't checked.
+- A record that isn't JSON data, such as a set, an arbitrary object or a dict with non-str keys, raises `TypeError` from `validate`, `is_valid` and `iter_errors`, and from the `Validator` methods. Before, it raised jsonschema-rs's `ValueError` (`Unsupported type: 'set'`), which `except ValueError` mistook for an invalid record.
+- A record that isn't a JSON object, such as a list or `None`, is still reported as invalid, not as a `TypeError`.
+- `ValidationError` and `Validator` now say they belong to `oatschema`, not the private `oatschema._validation`: tracebacks end `oatschema.ValidationError: …`, and pickles refer to `oatschema.ValidationError`. Errors pickled by 0.8.0.1 still unpickle.
+- The README describes when the API may break, and how to pin: `oatschema[validate]>=0.8.0.1,<0.9`. It no longer suggests `oatschema~=0.8.0`.
+
 ## 0.8.0.1 (2026-10-19)
 
 No schema changes: the bundled schema versions are still 0.4.0 to 0.8.0.
