@@ -25,11 +25,11 @@ import oatschema
 
 oatschema.validate({"labels": [{"label": "cat", "score": 0.92}]}, "classification")  # passes
 oatschema.validate({"labels": [{"label": "cat", "score": 1.5}]}, "classification")
-# oatschema.ValidationError: classification 0.8.0 at /labels/0/score: … is greater than the maximum of 1
+# oatschema.ValidationError: classification 0.9.0 at /labels/0/score: … is greater than the maximum of 1
 
 schema = oatschema.get_schema("classification")  # a fresh dict, safe to modify
-schema["$id"]  # "https://oatschema.org/0.8.0/classification"
-oatschema.SCHEMA_VERSION  # "0.8.0", used when you don't pass a version
+schema["$id"]  # "https://oatschema.org/0.9.0/classification"
+oatschema.SCHEMA_VERSION  # "0.9.0", used when you don't pass a version
 ```
 
 Requires Python 3.11 or later. `pip install oatschema` installs the schemas alone, with no dependencies; `get_schema` works without the extra. `oatschema[all]` installs every optional feature.
@@ -64,7 +64,7 @@ except oatschema.ValidationError as error:
     error.path  # ("labels", 0, "score"): where in the record
     error.schema_path  # ("properties", "labels", ..., "maximum"): which rule failed
     error.keyword  # "maximum": the last keyword in schema_path
-    error.schema_name, error.schema_version  # "classification", "0.8.0"
+    error.schema_name, error.schema_version  # "classification", "0.9.0"
     error.message  # "… is greater than the maximum of 1"
 
 for error in oatschema.iter_errors(record, "classification"):
@@ -103,6 +103,29 @@ validator = Draft202012Validator(schema, format_checker=Draft202012Validator.FOR
 validator.is_valid({"labels": [{"label": "cat", "score": 0.92}]})  # True
 ```
 
+## Checking numbers before you write a record
+
+Every number in OATS 0.9.0 is bounded within ±9,007,199,254,740,991, so every JSON implementation reads each integer the same way. `check_numbers` gets a record there before it is written. It never rounds, and it reports everything it changes:
+
+```python
+checked = oatschema.check_numbers(record, "classification")
+checked.record  # a new record; the one you passed is not modified
+checked.dropped  # (DroppedNumber(path, value, reason), ...)
+checked.converted  # (ConvertedNumber(path, before, after), ...)
+```
+
+**Conversions keep the value exactly:** numpy values and arrays become Python ones, `-0.0` becomes `0.0`, a whole float in an `integer` field becomes an int, and, from schema version 0.9.0, an int `seed` becomes its string form. A float `seed` is not converted, and a fractional number in an `integer` field fails validation. A value with no exact JSON form, such as a `Decimal`, a numpy `datetime64` or a `longdouble`, raises `TypeError`.
+
+**A bad number** is NaN, ±infinity, beyond the range above in any schema version, or outside its field's own bounds, such as a `score` of 1.5:
+
+- under a property, it is removed, listed in `dropped`, and reported with a `DroppedNumberWarning`. The record is then validated, so if the property was required, the record is rejected;
+- in a list, or at the top level, it rejects the record, because removing it would change what the list says;
+- with `on_bad_number="raise"`, any bad number rejects the record. Conversions still happen.
+
+A rejected record raises `oatschema.ValidationError`. The result is always valid against the schema version you pass, and dropping one of a pair, such as `interval_lower` without `interval_upper`, can leave a valid record that says less, so read `dropped`.
+
+**Strings.** RFC 7493 forbids unpaired surrogates (`"\ud800"`), so `validate`, `is_valid`, `iter_errors` and `check_numbers` treat a string or property name containing one as invalid, in every schema version. This check is in this package, not the schemas, so other JSON Schema validators accept them.
+
 ## API
 
 | Name | Description |
@@ -118,9 +141,10 @@ validator.is_valid({"labels": [{"label": "cat", "score": 0.92}]})  # True
 | `iter_errors(record, name, version=None, *, check_formats=True)` | An iterator over every error, as `ValidationError`s. Needs `[validate]` |
 | `get_validator(name, version=None, *, check_formats=True)` | The cached `Validator`. Needs `[validate]` |
 | `Validator` | `validate(record)`, `is_valid(record)` and `iter_errors(record)`, plus read-only `schema_name`, `schema_version`, `schema` and `check_formats` |
+| `check_numbers(record, name, version=None, *, on_bad_number="drop", check_formats=True)` | A `CheckedRecord(record, dropped, converted)`. See [Checking numbers](#checking-numbers-before-you-write-a-record) |
 | `ValidationError` | A `ValueError` with `message`, `schema_name`, `schema_version`, `path`, `schema_path` and `keyword` |
 
-- `version` must be exact: `"0.8.0"`, never `"0.8"` or `"latest"`.
+- `version` must be exact: `"0.9.0"`, never `"0.8"` or `"latest"`.
 - A name that exists in no bundled version raises `ValueError`. A version that isn't bundled, or that lacks the schema, raises `LookupError`.
 - `check_formats=False` turns off checking of `format` (`date-time`, `uri`). It is keyword-only, and must be `True` or `False`.
 - Arguments of the wrong type raise `TypeError`, naming the expected call: a name that isn't a str, a version that is neither a str nor `None`, or a record that isn't JSON data (a set, an arbitrary object, a dict with non-str keys). So does a record passed after the schema name, as in `validate(name, record)`, which should be `validate(record, name)`. A record that is JSON data but not an object, such as a list or `None`, is reported as invalid, not as a `TypeError`.
@@ -135,14 +159,14 @@ oatschema.is_valid({"labels": []}, "classification", version="0.7.0")  # False: 
 oatschema.is_valid({"labels": []}, "classification")  # True: from 0.8.0 an empty list means "checked, found nothing"
 ```
 
-- From 0.7.0, each `$id` includes its version (`https://oatschema.org/0.8.0/classification`), so several versions can share one registry.
+- From 0.7.0, each `$id` includes its version (`https://oatschema.org/0.9.0/classification`), so several versions can share one registry.
 - Each schema states its own version: in `x-version` from 0.8.0, and in `version` up to 0.7.0.
 - **Legacy versions.** 0.4.0 to 0.6.0 predate OATS and are listed in `LEGACY_VERSIONS`. All three use the same `$id` for each schema (`https://dorsalhub.com/schemas/open/<name>`). Build each validator from a single schema, and never load two of these versions into one registry.
 
 **Package versions.** The package version is `a.b.c.d`:
 
 - `a.b.c` is the newest bundled schema version, equal to `SCHEMA_VERSION`;
-- `d` is the package's own revision, for fixes and features that add no schema version. It is left out when it is 0, so `0.8.0` is followed by `0.8.0.1`, `0.8.0.2`, and so on.
+- `d` is the package's own revision, for fixes and features that add no schema version: `0.9.0.0`, then `0.9.0.1`, and so on. The first release, `0.8.0`, left it out.
 
 Upgrading never removes a schema version, but a new schema version moves the default `SCHEMA_VERSION`.
 
@@ -154,7 +178,7 @@ Upgrading never removes a schema version, but a new schema version moves the def
 **Pinning.** Allow every release up to the next schema minor version, from the release whose features you use:
 
 ```
-oatschema[validate]>=0.8.0.1,<0.9
+oatschema[validate]>=0.9.0.0,<0.10
 ```
 
 From OATS 1.0, allow every release up to the next major version instead, for example `oatschema[validate]>=1.3,<2`.

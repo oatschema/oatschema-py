@@ -15,11 +15,11 @@ The release-example tests validate every bundled version against that release's 
 
 ## Package versions
 
-The package version is `a.b.c.d`. `a.b.c` is the newest bundled schema version (`oatschema.SCHEMA_VERSION`), and `d` is the package's own revision, omitted when it is 0. See the README for how users should pin.
+The package version is `a.b.c.d`. `a.b.c` is the newest bundled schema version (`oatschema.SCHEMA_VERSION`), and `d` is the package's own revision. See the README for how users should pin.
 
 - Never publish `a.b.c` before oats has tagged and pushed `va.b.c`.
 - Every release bundles every schema version from 0.4.0 onward. A version is never removed or changed once bundled.
-- A package-only fix or feature bumps `d`: `0.8.0.1`, `0.8.0.2`, and so on.
+- A new schema version starts at `d` = 0: `0.9.0.0`. A package-only fix or feature bumps `d`: `0.9.0.1`, and so on.
 
 ## Bundling a new schema release
 
@@ -31,7 +31,7 @@ The script copies `schemas/*.json` byte for byte from the tag into `src/oatschem
 
 - the tag isn't on `origin`, or points to a different commit there;
 - the version directory already exists;
-- a schema name isn't lowercase kebab-case starting with a letter, or is reserved (`changelog`, `docs`, `latest`), because oatschema.org serves schemas at its root;
+- a schema name isn't lowercase kebab-case starting with a letter, or is reserved (`changelog`, `docs`, `latest`, `tools`), because oatschema.org serves schemas at its root;
 - a file isn't UTF-8 JSON, or has duplicate keys;
 - `$schema` isn't draft 2020-12, or `$id` has the wrong form: `https://dorsalhub.com/schemas/open/<name>` before 0.7.0, `https://oatschema.org/<version>/<name>` from 0.7.0;
 - the schema's version doesn't match the tag. Up to 0.7.0 it is the top-level `version` keyword. From 0.8.0 it is `x-version`, a top-level `version` is rejected, and `x-license` must be Apache-2.0 with a "Copyright YYYY[-YYYY] The OATS Authors" notice.
@@ -39,7 +39,7 @@ The script copies `schemas/*.json` byte for byte from the tag into `src/oatschem
 Then, in one change:
 
 1. Set `SCHEMA_VERSION` in `src/oatschema/_schemas.py` to the new version, and add any new names to `SchemaName`.
-2. Set `__version__` in `src/oatschema/__init__.py` to `X.Y.Z`.
+2. Set `__version__` in `src/oatschema/__init__.py` to `X.Y.Z.0`.
 3. Add a CHANGELOG entry.
 
 The tests check that these agree with the bundled files.

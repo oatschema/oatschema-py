@@ -23,7 +23,7 @@ SchemaName = Literal[
     "temporal-segmentation",
 ]
 
-SCHEMA_VERSION = "0.8.0"
+SCHEMA_VERSION = "0.9.0"
 LEGACY_VERSIONS = ("0.4.0", "0.5.0", "0.6.0")
 
 _VERSION_PATTERN = re.compile(r"(\d+)\.(\d+)\.(\d+)")
@@ -71,7 +71,7 @@ def check_arguments(call: str, name: object, version: object) -> None:
         raise TypeError(f"the schema name must be a str, not {type(name).__name__}; expected {call}")
     if version is not None and not isinstance(version, str):
         raise TypeError(
-            f"version must be a str such as '0.8.0', or None, not {type(version).__name__}; expected {call}"
+            f"version must be a str such as '0.9.0', or None, not {type(version).__name__}; expected {call}"
         )
 
 
@@ -98,7 +98,7 @@ def get_schema(name: SchemaName, version: str | None = None, *, mode: Literal["d
 
     With ``mode="dict"`` (the default), each call returns a new dict, so callers may modify it freely.
     With ``mode="json"``, it returns the schema file's text exactly as released.
-    ``version`` must be an exact bundled version such as ``"0.8.0"``; partial versions and aliases are not accepted.
+    ``version`` must be an exact bundled version such as ``"0.9.0"``; partial versions and aliases are not accepted.
 
     Raises:
         TypeError: ``name`` or ``mode`` is not a str, or ``version`` is neither a str nor ``None``.

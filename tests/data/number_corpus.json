@@ -1,0 +1,440 @@
+[
+ {
+  "id": "ranking/results/0/rank = 2^53-1",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9007199254740991, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 2^53",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9007199254740992, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^53+1",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9007199254740993, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^53+2",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9007199254740994, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^63-1",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9223372036854775807, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^64",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 18446744073709551616, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^1024-2^971 (int literal = DBL_MAX)",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 2^1024-2^970 (int literal)",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 10^400",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 1.0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1.0, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 1e0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1e0, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 1e2",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1e2, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 1E2",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1E2, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 100.0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 100.0, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 1.0000000000000001 (>17 sig)",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1.0000000000000001, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": true
+ },
+ {
+  "id": "ranking/results/0/rank = 1.5",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1.5, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 9007199254740993.0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 9007199254740993.0, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 1e20",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1e20, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 1e308",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1e308, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = 1e309",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1e309, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/results/0/rank = -0 (min 1)",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": -0, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}]}",
+  "valid": false
+ },
+ {
+  "id": "ranking/total_candidates = -0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}], \"total_candidates\": -0}",
+  "valid": true
+ },
+ {
+  "id": "ranking/total_candidates = -0.0",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}], \"total_candidates\": -0.0}",
+  "valid": true
+ },
+ {
+  "id": "ranking/total_candidates = -1",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}], \"total_candidates\": -1}",
+  "valid": false
+ },
+ {
+  "id": "ranking/total_candidates = -(2^53+1)",
+  "schema": "ranking",
+  "text": "{\"target\": \"near-duplicate\", \"producer\": \"imagehash 4.3 (pHash)\", \"score_explanation\": \"1 - (Hamming distance / 64).\", \"results\": [{\"rank\": 1, \"id\": \"photos/2024/IMG_0412.jpg\", \"score\": 0.969, \"attributes\": {\"hamming_distance\": 2}}, {\"rank\": 2, \"id\": \"photos/2024/IMG_0415.jpg\", \"score\": 0.859, \"attributes\": {\"hamming_distance\": 9}}], \"total_candidates\": -9007199254740993}",
+  "valid": false
+ },
+ {
+  "id": "llm-output/generation_params/seed = -(2^53-1)",
+  "schema": "llm-output",
+  "text": "{\"model\": \"gpt-4o\", \"prompt\": \"Extract the invoice number, total amount, and due date from this document.\", \"response_data\": \"{\\\"invoice_id\\\": \\\"INV-9528\\\", \\\"total_due\\\": 1450.75, \\\"due_date\\\": \\\"2025-10-31\\\"}\", \"language\": \"eng\", \"score\": 0.95, \"score_explanation\": \"Extraction accuracy, from -1.0 (wrong) to 1.0 (correct).\", \"generation_params\": {\"system_prompt\": \"You are an expert financial document parser. You must only output a valid JSON object.\", \"temperature\": 0.0, \"max_tokens\": 1000, \"response_format\": {\"type\": \"json_object\"}, \"seed\": -9007199254740991}, \"generation_metadata\": {\"response_id\": \"chatcmpl-9qA8ZypD4YcW1bF5c6e7g8H9iJkLmN\", \"created\": \"2025-09-17T11:45:00Z\", \"finish_reason\": \"stop\", \"system_fingerprint\": \"fp_a24b9d3f8e\", \"usage\": {\"prompt_tokens\": 820, \"completion_tokens\": 45, \"total_tokens\": 865}}}",
+  "valid": false
+ },
+ {
+  "id": "llm-output/generation_params/seed = -(2^53+1)",
+  "schema": "llm-output",
+  "text": "{\"model\": \"gpt-4o\", \"prompt\": \"Extract the invoice number, total amount, and due date from this document.\", \"response_data\": \"{\\\"invoice_id\\\": \\\"INV-9528\\\", \\\"total_due\\\": 1450.75, \\\"due_date\\\": \\\"2025-10-31\\\"}\", \"language\": \"eng\", \"score\": 0.95, \"score_explanation\": \"Extraction accuracy, from -1.0 (wrong) to 1.0 (correct).\", \"generation_params\": {\"system_prompt\": \"You are an expert financial document parser. You must only output a valid JSON object.\", \"temperature\": 0.0, \"max_tokens\": 1000, \"response_format\": {\"type\": \"json_object\"}, \"seed\": -9007199254740993}, \"generation_metadata\": {\"response_id\": \"chatcmpl-9qA8ZypD4YcW1bF5c6e7g8H9iJkLmN\", \"created\": \"2025-09-17T11:45:00Z\", \"finish_reason\": \"stop\", \"system_fingerprint\": \"fp_a24b9d3f8e\", \"usage\": {\"prompt_tokens\": 820, \"completion_tokens\": 45, \"total_tokens\": 865}}}",
+  "valid": false
+ },
+ {
+  "id": "llm-output/generation_params/seed = 2^64-1",
+  "schema": "llm-output",
+  "text": "{\"model\": \"gpt-4o\", \"prompt\": \"Extract the invoice number, total amount, and due date from this document.\", \"response_data\": \"{\\\"invoice_id\\\": \\\"INV-9528\\\", \\\"total_due\\\": 1450.75, \\\"due_date\\\": \\\"2025-10-31\\\"}\", \"language\": \"eng\", \"score\": 0.95, \"score_explanation\": \"Extraction accuracy, from -1.0 (wrong) to 1.0 (correct).\", \"generation_params\": {\"system_prompt\": \"You are an expert financial document parser. You must only output a valid JSON object.\", \"temperature\": 0.0, \"max_tokens\": 1000, \"response_format\": {\"type\": \"json_object\"}, \"seed\": 18446744073709551615}, \"generation_metadata\": {\"response_id\": \"chatcmpl-9qA8ZypD4YcW1bF5c6e7g8H9iJkLmN\", \"created\": \"2025-09-17T11:45:00Z\", \"finish_reason\": \"stop\", \"system_fingerprint\": \"fp_a24b9d3f8e\", \"usage\": {\"prompt_tokens\": 820, \"completion_tokens\": 45, \"total_tokens\": 865}}}",
+  "valid": false
+ },
+ {
+  "id": "llm-output/generation_params/seed = -10^400",
+  "schema": "llm-output",
+  "text": "{\"model\": \"gpt-4o\", \"prompt\": \"Extract the invoice number, total amount, and due date from this document.\", \"response_data\": \"{\\\"invoice_id\\\": \\\"INV-9528\\\", \\\"total_due\\\": 1450.75, \\\"due_date\\\": \\\"2025-10-31\\\"}\", \"language\": \"eng\", \"score\": 0.95, \"score_explanation\": \"Extraction accuracy, from -1.0 (wrong) to 1.0 (correct).\", \"generation_params\": {\"system_prompt\": \"You are an expert financial document parser. You must only output a valid JSON object.\", \"temperature\": 0.0, \"max_tokens\": 1000, \"response_format\": {\"type\": \"json_object\"}, \"seed\": -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}, \"generation_metadata\": {\"response_id\": \"chatcmpl-9qA8ZypD4YcW1bF5c6e7g8H9iJkLmN\", \"created\": \"2025-09-17T11:45:00Z\", \"finish_reason\": \"stop\", \"system_fingerprint\": \"fp_a24b9d3f8e\", \"usage\": {\"prompt_tokens\": 820, \"completion_tokens\": 45, \"total_tokens\": 865}}}",
+  "valid": false
+ },
+ {
+  "id": "llm-output/generation_params/seed = -1e400",
+  "schema": "llm-output",
+  "text": "{\"model\": \"gpt-4o\", \"prompt\": \"Extract the invoice number, total amount, and due date from this document.\", \"response_data\": \"{\\\"invoice_id\\\": \\\"INV-9528\\\", \\\"total_due\\\": 1450.75, \\\"due_date\\\": \\\"2025-10-31\\\"}\", \"language\": \"eng\", \"score\": 0.95, \"score_explanation\": \"Extraction accuracy, from -1.0 (wrong) to 1.0 (correct).\", \"generation_params\": {\"system_prompt\": \"You are an expert financial document parser. You must only output a valid JSON object.\", \"temperature\": 0.0, \"max_tokens\": 1000, \"response_format\": {\"type\": \"json_object\"}, \"seed\": -1e400}, \"generation_metadata\": {\"response_id\": \"chatcmpl-9qA8ZypD4YcW1bF5c6e7g8H9iJkLmN\", \"created\": \"2025-09-17T11:45:00Z\", \"finish_reason\": \"stop\", \"system_fingerprint\": \"fp_a24b9d3f8e\", \"usage\": {\"prompt_tokens\": 820, \"completion_tokens\": 45, \"total_tokens\": 865}}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [2^53-2, 2^53-1]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [9007199254740990, 9007199254740991], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": true
+ },
+ {
+  "id": "embedding/vector/indices = [2^53, 2^53+1]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [9007199254740992, 9007199254740993], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [2^53, 2^53+2]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [9007199254740992, 9007199254740994], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [1, 1.0]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [1, 1.0], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [0, -0]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [0, -0], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [100, 1e2]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [100, 1e2], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/indices = [10^400]",
+  "schema": "embedding",
+  "text": "{\"model\": \"splade-v2-distilbert\", \"target\": \"product_description\", \"vector\": {\"dimensions\": 30522, \"indices\": [10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000], \"values\": [0.45, 1.2, 0.8, 0.15, 2.1, 0.05]}, \"attributes\": {\"sparsity_ratio\": 0.9998}}",
+  "valid": false
+ },
+ {
+  "id": "document-extraction/page_width/0/pages = [2^53, 2^53+1]",
+  "schema": "document-extraction",
+  "text": "{\"extraction_type\": \"mixed\", \"unit\": \"px\", \"page_width\": [{\"value\": 850, \"pages\": [9007199254740992, 9007199254740993]}, {\"value\": 1100, \"pages\": [2]}], \"page_height\": 1100, \"blocks\": [{\"block_type\": \"box\", \"id\": \"logo-box\", \"page_number\": 1, \"box\": {\"x\": 50, \"y\": 50, \"width\": 200, \"height\": 80}, \"attributes\": {\"visual_class\": \"logo\"}}, {\"block_type\": \"multi_polygon\", \"id\": \"occluded-stamp\", \"page_number\": 2, \"multi_polygon\": [[{\"x\": 100, \"y\": 100}, {\"x\": 200, \"y\": 100}, {\"x\": 200, \"y\": 150}, {\"x\": 100, \"y\": 150}], [{\"x\": 100, \"y\": 180}, {\"x\": 200, \"y\": 180}, {\"x\": 200, \"y\": 250}, {\"x\": 100, \"y\": 250}]]}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 1e308",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 1e308, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 1.7976931348623157e308",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 1.7976931348623157e308, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 1.7976931348623158e308 (rounds to max)",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 1.7976931348623158e308, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 1.8e308",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 1.8e308, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 2^1024-2^970 (int literal)",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 179769313486231580793728971405303415079934132710037826936173778980444968292764750946649017977587207096330286416692887910946555547851940402630657488671505820681908902000708383676273854845817711531764475730270069855571366959622842914819860834936475292719074168444365510704342711559699508093042880177904174497792, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 10^400 int",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = 10^400 .5",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.5, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "temporal-segmentation/duration = -0",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": -0, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": true
+ },
+ {
+  "id": "temporal-segmentation/duration = -0.0",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": -0.0, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": true
+ },
+ {
+  "id": "temporal-segmentation/duration = 5e-324",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 5e-324, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": true
+ },
+ {
+  "id": "temporal-segmentation/duration = 1e-400",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 1e-400, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": true
+ },
+ {
+  "id": "temporal-segmentation/duration = 0.1000000000000000055511151231257827 (exact double of 0.1)",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 0.1000000000000000055511151231257827, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": true
+ },
+ {
+  "id": "temporal-segmentation/duration = 123456789012345678901234567890.123",
+  "schema": "temporal-segmentation",
+  "text": "{\"producer\": \"Manual Review\", \"duration\": 123456789012345678901234567890.123, \"vocabulary\": [\"chapter\", \"scene\"], \"segments\": [{\"id\": \"ch-1\", \"label\": \"chapter\", \"title\": \"Intro\", \"start_time\": 0, \"end_time\": 95.2}, {\"id\": \"ch-2\", \"label\": \"chapter\", \"title\": \"Building the Frame\", \"start_time\": 95.2, \"end_time\": 1834.5}, {\"id\": \"sc-1\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Host introduces the project in the workshop.\", \"start_time\": 0, \"end_time\": 41.0}, {\"id\": \"sc-2\", \"parent_id\": \"ch-1\", \"label\": \"scene\", \"description\": \"Montage of the finished piece.\", \"start_time\": 41.0, \"end_time\": 95.2}, {\"id\": \"sc-3\", \"parent_id\": \"ch-2\", \"label\": \"scene\", \"start_time\": 95.2, \"end_time\": 1834.5}]}",
+  "valid": false
+ },
+ {
+  "id": "document-extraction/page_width = 5e-324",
+  "schema": "document-extraction",
+  "text": "{\"extraction_type\": \"mixed\", \"unit\": \"pt\", \"blocks\": [{\"block_type\": \"text\", \"id\": \"c7a4b0c8-3b1a-4b6f-8c3b-2a7e1a3e4b5c\", \"text\": \"Annual Report Summary\", \"page_number\": 1}, {\"block_type\": \"box\", \"id\": \"d8b5c1d9-4c2b-4c7f-9d4c-3b8f2b4f5c6d\", \"text\": \"The first column of text begins here, discussing the quarterly earnings and projections for the upcoming fiscal year.\", \"page_number\": 1, \"box\": {\"x\": 50, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"box\", \"id\": \"e9c6d2e0-5d3c-4d8b-a0e5-4c9c3c5c6d7e\", \"text\": \"The second column contains shareholder information and a summary of the annual general meeting.\", \"page_number\": 1, \"box\": {\"x\": 320, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"polygon\", \"id\": \"f0d7e3f1-6e4d-4e9a-b1f6-5d0b4d6b7e8f\", \"text\": \"This caption is wrapped around a circular diagram on the page.\", \"page_number\": 2, \"polygon\": [{\"x\": 100, \"y\": 100}, {\"x\": 500, \"y\": 100}, {\"x\": 500, \"y\": 250}, {\"x\": 350, \"y\": 250}, {\"x\": 350, \"y\": 150}, {\"x\": 100, \"y\": 150}]}], \"page_width\": 5e-324}",
+  "valid": true
+ },
+ {
+  "id": "document-extraction/page_width = 1e-400 (->0, exclusiveMinimum 0)",
+  "schema": "document-extraction",
+  "text": "{\"extraction_type\": \"mixed\", \"unit\": \"pt\", \"blocks\": [{\"block_type\": \"text\", \"id\": \"c7a4b0c8-3b1a-4b6f-8c3b-2a7e1a3e4b5c\", \"text\": \"Annual Report Summary\", \"page_number\": 1}, {\"block_type\": \"box\", \"id\": \"d8b5c1d9-4c2b-4c7f-9d4c-3b8f2b4f5c6d\", \"text\": \"The first column of text begins here, discussing the quarterly earnings and projections for the upcoming fiscal year.\", \"page_number\": 1, \"box\": {\"x\": 50, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"box\", \"id\": \"e9c6d2e0-5d3c-4d8b-a0e5-4c9c3c5c6d7e\", \"text\": \"The second column contains shareholder information and a summary of the annual general meeting.\", \"page_number\": 1, \"box\": {\"x\": 320, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"polygon\", \"id\": \"f0d7e3f1-6e4d-4e9a-b1f6-5d0b4d6b7e8f\", \"text\": \"This caption is wrapped around a circular diagram on the page.\", \"page_number\": 2, \"polygon\": [{\"x\": 100, \"y\": 100}, {\"x\": 500, \"y\": 100}, {\"x\": 500, \"y\": 250}, {\"x\": 350, \"y\": 250}, {\"x\": 350, \"y\": 150}, {\"x\": 100, \"y\": 150}]}], \"page_width\": 1e-400}",
+  "valid": false
+ },
+ {
+  "id": "document-extraction/page_width = -0",
+  "schema": "document-extraction",
+  "text": "{\"extraction_type\": \"mixed\", \"unit\": \"pt\", \"blocks\": [{\"block_type\": \"text\", \"id\": \"c7a4b0c8-3b1a-4b6f-8c3b-2a7e1a3e4b5c\", \"text\": \"Annual Report Summary\", \"page_number\": 1}, {\"block_type\": \"box\", \"id\": \"d8b5c1d9-4c2b-4c7f-9d4c-3b8f2b4f5c6d\", \"text\": \"The first column of text begins here, discussing the quarterly earnings and projections for the upcoming fiscal year.\", \"page_number\": 1, \"box\": {\"x\": 50, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"box\", \"id\": \"e9c6d2e0-5d3c-4d8b-a0e5-4c9c3c5c6d7e\", \"text\": \"The second column contains shareholder information and a summary of the annual general meeting.\", \"page_number\": 1, \"box\": {\"x\": 320, \"y\": 120, \"width\": 250, \"height\": 400}}, {\"block_type\": \"polygon\", \"id\": \"f0d7e3f1-6e4d-4e9a-b1f6-5d0b4d6b7e8f\", \"text\": \"This caption is wrapped around a circular diagram on the page.\", \"page_number\": 2, \"polygon\": [{\"x\": 100, \"y\": 100}, {\"x\": 500, \"y\": 100}, {\"x\": 500, \"y\": 250}, {\"x\": 350, \"y\": 250}, {\"x\": 350, \"y\": 150}, {\"x\": 100, \"y\": 150}]}], \"page_width\": -0}",
+  "valid": false
+ },
+ {
+  "id": "classification/labels/0/score = 1.00000000000000001 (>1, rounds to 1)",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 1.00000000000000001}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}]}",
+  "valid": true
+ },
+ {
+  "id": "classification/labels/0/score = 1.0000000000000002",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 1.0000000000000002}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}]}",
+  "valid": false
+ },
+ {
+  "id": "classification/labels/0/score = -1.00000000000000001",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": -1.00000000000000001}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}]}",
+  "valid": true
+ },
+ {
+  "id": "classification/labels/0/score = 1e400",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 1e400}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}]}",
+  "valid": false
+ },
+ {
+  "id": "classification/labels/0/score = int 10^400",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}]}",
+  "valid": false
+ },
+ {
+  "id": "classification/attributes/n = 2^53+1",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 0.98}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}], \"attributes\": {\"n\": 9007199254740993}}",
+  "valid": false
+ },
+ {
+  "id": "classification/attributes/n = 10^400 int",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 0.98}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}], \"attributes\": {\"n\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}}",
+  "valid": false
+ },
+ {
+  "id": "classification/attributes/n = 1e400",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 0.98}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}], \"attributes\": {\"n\": 1e400}}",
+  "valid": false
+ },
+ {
+  "id": "classification/attributes/n = -10^400 int",
+  "schema": "classification",
+  "text": "{\"score_explanation\": \"Model confidence probability, where 1.0 is 100% confident.\", \"vocabulary\": [\"animal\", \"cat\", \"dog\", \"house\", \"vehicle\"], \"labels\": [{\"label\": \"animal\", \"score\": 0.98}, {\"label\": \"cat\", \"score\": 0.95}, {\"label\": \"house\", \"score\": 0.75}], \"attributes\": {\"n\": -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}}",
+  "valid": false
+ },
+ {
+  "id": "generic/data/n = 2^64",
+  "schema": "generic",
+  "text": "{\"description\": \"Output from image quality analysis script v1.2\", \"data\": {\"is_blurry\": false, \"contrast_score\": 0.87, \"dominant_color_hex\": \"#1a4e8a\", \"resolution_width\": 1920, \"primary_subject\": null, \"n\": 18446744073709551616}}",
+  "valid": false
+ },
+ {
+  "id": "generic/data/n = 10^400 int",
+  "schema": "generic",
+  "text": "{\"description\": \"Output from image quality analysis script v1.2\", \"data\": {\"is_blurry\": false, \"contrast_score\": 0.87, \"dominant_color_hex\": \"#1a4e8a\", \"resolution_width\": 1920, \"primary_subject\": null, \"n\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/0 = 10^400 int",
+  "schema": "embedding",
+  "text": "{\"model\": \"CLIP\", \"vector\": [10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0.3928860881414771, 0.2927065034998443, 0.04427722162564385, 0.8620486085050627, 0.3979164773619779, 0.9380362132437956, 0.5511102320249636, 0.24684195328733172, 0.5849077235444989, 0.7638802608321855, 0.8755041402186888, 0.13221213345221194, 0.6573382522980222, 0.2749032866696507, 0.6629076544268617, 0.7965879607174466, 0.5537725230008717, 0.21675185581819245, 0.906065602689423, 0.8169241341436715, 0.8727080427751276, 0.4439201003564489, 0.9592329974927004, 0.5671052911407125, 0.43550812720623755, 0.6080475780563984, 0.5699140686433883, 0.9755421555618785, 0.8066507879548588, 0.628209533250657, 0.19416450083034686, 0.5922210248438123, 0.1120516799919119, 0.4260176598023282, 0.7301724591688036, 0.6844570005032309, 0.43340706589710687, 0.8398882872570546, 0.9947597661707648, 0.17281790439944422, 0.9277074824016571, 0.0009684766313903248, 0.9451350522378468, 0.3858452079523006, 0.6169073929713942, 0.5796626658338161, 0.24814779810714893, 0.10741993356074431, 0.8388887161608071, 0.49661960463652677, 0.37570236393057455, 0.9129246500006606, 0.7740942690031214, 0.2959808410407483, 0.5087960784536449, 0.16545762972739086, 0.194997757305726, 0.34644184840476877, 0.7262831886112979, 0.9561370002030498, 0.6070103815782784, 0.5425816631611362, 0.1185123819364009, 0.8738566377960817, 0.0819411799866121, 0.8715952140087467, 0.4899291863661732, 0.6233318673607056, 0.4998271392942655, 0.7353995459934561, 0.038686539440651924, 0.515844653472376, 0.7729882669658982, 0.9529743416429443, 0.8800247318307286, 0.08568906496178563, 0.5130722987942083, 0.1763106601487776, 0.6143913925908676, 0.0025205397151480957, 0.5556464099237614, 0.34113239715078214, 0.7618112619650587, 0.6364429358830379, 0.3018587692169026, 0.7203210139894279, 0.18644631149602953, 0.028865483803378167, 0.29621136294200956, 0.8715386841082103, 0.8588097213329796, 0.6803179392644656, 0.6663811516755945, 0.16569512703083134, 0.056450140155162254, 0.20467474668078955, 0.8630876242321872, 0.6189239961195248, 0.3388835327780404, 0.42709649310492614, 0.28336425238122553, 0.9202768337404648, 0.17914287686192165, 0.6792850293042347, 0.9172869030372179, 0.2767494680627237, 0.43582625465482216, 0.1478930332338062, 0.05797397831121509, 0.16505991891728677, 0.31106187418646514, 0.25371177000980993, 0.5447706787713746, 0.3721711266094829, 0.3972696736436304, 0.67405899668011, 0.963363835076907, 0.28167897320666513, 0.15060226580296, 0.8623115026811288, 0.5904454704094195, 0.05072953561479143, 0.4392719945478185, 0.5535471030002138, 0.1453368354613891, 0.5235287952504617, 0.9875633442131483, 0.7736829654232705, 0.944155567536851, 0.4756527895436381, 0.6865956686026452, 0.6679842422892658, 0.6934520856537957, 0.9748365925779123, 0.6854111002394248, 0.6319967057321316, 0.06557079571317703, 0.43151954301439377, 0.512613200946483, 0.8868081745829178, 0.739580136687667, 0.8995945613852749, 0.3229835770852667, 0.8334376293704442, 0.3455811192450624, 0.34957240635711173, 0.8993840667661874, 0.36557245157595386, 0.013220822765538043, 0.3721244874401951, 0.8379045105828918, 0.9832755899965988, 0.29695801261735555, 0.3619275001313005, 0.5154772153714071, 0.06917075226258751, 0.699020743032159, 0.13904339286894207, 0.9447965099492669, 0.6118579030199893, 0.8996363028431784, 0.8078308140999391, 0.9936357149377416, 0.023352467401376087, 0.3936934864359469, 0.42510660457709337, 0.05002587268073788, 0.1582071674744956, 0.5857380643766411, 0.9103787807813887, 0.39841612015939987, 0.9120034540758428, 0.32073301896450546, 0.6161298555811137, 0.47924555864608787, 0.489331728176124, 0.585527765278281, 0.94926094407286, 0.7940228326976644, 0.40432911318710063, 0.8691849695973565, 0.6333670936081254, 0.5068050950095979, 0.6255301757417557, 0.7940063250091692, 0.37775739023187915, 0.15806597271280076, 0.6342117366426379, 0.9068981423169652, 0.6171335829265029, 0.3726957561302625, 0.9441981766666824, 0.16963077145052619, 0.5137590371779257, 0.44576039701752457, 0.22305574133263806, 0.432295105895504, 0.263288074106906, 0.9629334989847157, 0.16584321757131582, 0.5549119711698555, 0.5248493521966581, 0.3878748268026537, 0.6138438592034866, 0.2033371340677016, 0.1082439005320065, 0.8434984528546631, 0.46177471852878704, 0.3275569400666237, 0.9181388868042923, 0.9352362501699887, 0.02229236806230528, 0.6584177428622306, 0.08506364694740509, 0.5997929607014989, 0.4903496997604935, 0.14569937295841673, 0.8175764210348218, 0.2785025174974717, 0.6943420944059983, 0.9418182352673502, 0.9729593745058315, 0.6830161693961333, 0.6343764437401818, 0.6956444028440391, 0.5550997703132665, 0.36606685578530795, 0.811974416156238, 0.31779527111875727, 0.03695049975608311, 0.7219657775068992, 0.7650254609716071, 0.5876129589062073, 0.8652540852281586, 0.17611272691903856, 0.21569775217219012, 0.7427589417598474, 0.8988051629007449, 0.8354844191944103, 0.6829972696012748, 0.3892516966295628, 0.5589191305726625, 0.005843774856633899, 0.6011335718136016, 0.6510792753073477, 0.8535481063787073, 0.3036123092200217, 0.8675710064778992, 0.03022088717332727, 0.42634492092051135, 0.5117833881436885, 0.8921740363945755, 0.7437489008743471, 0.004989024350583016, 0.13666861308045297, 0.34152167707837855, 0.8530153449763419, 0.3155272275771551, 0.2548880251680935, 0.3794245715441634, 0.7989865775397039, 0.4782402966959657, 0.5436962552420803, 0.8451815281914383, 0.3323750779827339, 0.14042444880021587, 0.23260681046471887, 0.08246263668989962, 0.8610127301283835, 0.8845213706321384, 0.04533177854958759, 0.3485019207240978, 0.21861642323918895, 0.2951038555218064, 0.06357253831321674, 0.25231640374217024, 0.15289627284340768, 0.48190840603888474, 0.04477803471851871, 0.6043154887648735, 0.15978168094708245, 0.7151854617290949, 0.9694643779390478, 0.7827973622130316, 0.26154029076140883, 0.727910495547946, 0.32906807723617626, 0.32847085090006956, 0.9615159318460949, 0.6785012544400671, 0.9202404071812904, 0.3045889493859505, 0.5231457664451223, 0.8145894180802276, 0.9900707231690478, 0.4548357924120462, 0.39941036494121285, 0.0006404957103453013, 0.9408044156860365, 0.4599424299852404, 0.244336200610774, 0.6690278616809016, 0.4492797209680215, 0.644406423620653, 0.21924893177549887, 0.5259692303814877, 0.8778814544484678, 0.48431155977764573, 0.33555904391997937, 0.30310246473017566, 0.2455845319963983, 0.02689565183872278, 0.8853109154524789, 0.7620193829216441, 0.18013292185434715, 0.15996828060920854, 0.2566814899886657, 0.1744976080945042, 0.2377422870457394, 0.9640340608113873, 0.8862540458332916, 0.6686674232847352, 0.7704724921914002, 0.26992496880012073, 0.5921355821775727, 0.29166921070928775, 0.6601178743235278, 0.48035958365322673, 0.5443489897861247, 0.037733783173298674, 0.19376037975658422, 0.8258328172638598, 0.7031288250363193, 0.47055493581183505, 0.08517608507956598, 0.9224122961741654, 0.7653474208632735, 0.4710082232634589, 0.8813299270792797, 0.7603360943773767, 0.2702188475777859, 0.0268534465878687, 0.10876875468216907, 0.3339909563875272, 0.3269863068126775, 0.7388962087164945, 0.75171614732691, 0.747370735446372, 0.31576631842388114, 0.8859784721106629, 0.7020384899207248, 0.3982005548797557, 0.2625412178679817, 0.36471000307031276, 0.6836944826104618, 0.30350099971445077, 0.7794293647264604, 0.3988888587666336, 0.7328728095056567, 0.9616308179143838, 0.820199337123817, 0.5829725694890002, 0.13109142887339065, 0.19453060804608624, 0.41853610632212745, 0.428117639611283, 0.26196470503229585, 0.5991663886891978, 0.40460254319836353, 0.3179632546569604, 0.1913776541283907, 0.42695432350100937, 0.38572527390045974, 0.8713592368664026, 0.19582092066359358, 0.6772990960005316, 0.8514786962770545, 0.294721824732207, 0.7937052548931274, 0.3234730335400079, 0.8537288818547456, 0.648033834135278, 0.7281187173713098, 0.5158452802873263, 0.4372754797563374, 0.5968372329769973, 0.2720171098308034, 0.46729484553552414, 0.9569040950216423, 0.426587820676964, 0.15050824713312938, 0.3626533997468101, 0.26965235365261153, 0.6815187885675372, 0.9588455642517077, 0.5505478989730719, 0.16464898951865037, 0.05527365361005132, 0.9379475289732668, 0.1144774464784667, 0.5135742397619041, 0.9940834140586009, 0.7041334048643889, 0.5459086546311472, 0.029733766696264263, 0.5466669730894426, 0.3677260538052357, 0.40538116864811724, 0.9387415831219998, 0.8996540619822558, 0.9297042023686727, 0.28094390989058315, 0.17673763529010722, 0.6396092703007015, 0.30724511864314197, 0.4941439364118555, 0.753915077732621, 0.3658444899140785, 0.05109853605495185, 0.584905774481102, 0.9722561911002139, 0.3125020700435587, 0.544132535830512, 0.8668995543432579, 0.8464693823843882, 0.27905361363003056, 0.704066318250066, 0.1346771663776951, 0.10475226980693786, 0.014087316406465433, 0.47355920384173555, 0.4469149800112511, 0.5797763184546287, 0.9696143467027472, 0.07985877470227265, 0.25098086353988136, 0.46285126967236045, 0.630794430251467, 0.7176253397571218, 0.6752198887849056, 0.14877815943128414, 0.6564423557284815, 0.6799518686164191, 0.7712751662777296, 0.22923888105372003, 0.04027585507807219, 0.22869252111369542, 0.5754913730019118, 0.5030741276588447, 0.75325256123783, 0.6236586330419585, 0.5539473892654003, 0.4117850529382897, 0.5711615598133031, 0.02598414046135178, 0.5605486707555856, 0.12022804022640143, 0.4215650690433904, 0.4783118979118526, 0.5402846931987778, 0.29091723929924906, 0.13803429146262214, 0.4033207779134995, 0.16564379252838723, 0.5267164165148921, 0.9682721255016712, 0.43712771511447157, 0.9553965237788896, 0.1519176098821936, 0.9556576667813319, 0.6917603411410133, 0.5196668490200929, 0.5730672163332315, 0.2366764154812908, 0.9969067173543045, 0.5551995564338973, 0.14029861641043062, 0.7725123883198465, 0.28778127142842524, 0.4245942430445543, 0.421604964819835, 0.7553524450229915, 0.7191331771577614, 0.5366508638081351, 0.1323977520590418, 0.6148406837788795, 0.5210688452300908, 0.875400547095993, 0.5273397558277674, 0.3655700279567532, 0.006023236635912865, 0.1742149814819176, 0.3926203930686889, 0.6946344773555259, 0.04380319514110609, 0.37966527005475526, 0.5456221779511897, 0.4105615358182714, 0.553947399586031, 0.520240946582033, 0.8031963017658026, 0.6207773892771005, 0.976518928450831, 0.19636936383110704, 0.8273059822418093, 0.9205282325920587, 0.47587737076388825, 0.24327715229957725, 0.680914501920244, 0.18803097362104104, 0.5066453201244097, 0.5537043362080176, 0.8621296205489517, 0.6225947966794444, 0.8855361242253936, 0.507675870916367, 0.46444717161102933, 0.27900247440564596, 0.12146894881837789, 0.5339230439532805, 0.2893243599536719, 0.4442333821716715, 0.18561428719997164, 0.022859520387686905, 0.5639682978775836, 0.4917942703587378, 0.9379664337816289, 0.155208873644599, 0.6441687461372617, 0.28515553615702305, 0.09431521858270775, 0.35183084628099903, 0.7977517717119945, 0.3150249723562545, 0.814509442279251, 0.9102205795297008, 0.9285873152077643, 0.15437577332274066, 0.028495248380122296, 0.7657918556989513, 0.10859623684721031, 0.23789241216306867, 0.6262818407310721, 0.8654466623038287, 0.2730251327088702, 0.35113846728334286, 0.8757017385950701, 0.8530419044838097, 0.885800508742564, 0.8133989232077341, 0.9331644209157145, 0.508629582875889, 0.2251255238445513, 0.04444873381235526, 0.32150369832378833, 0.9653341509208261, 0.7781593716052119, 0.19554175897163406, 0.24073284742672052, 0.5225803240908267, 0.8515501418094406, 0.4471147997675562, 0.6566725678764558, 0.4023497457832015, 0.12934449341807286, 0.1860454262704222, 0.800629242080977, 0.5653021985586297, 0.5995780273998301, 0.766344101274734, 0.0161713246266314, 0.8577897371552666, 0.17375678039004905, 0.3288169719189775, 0.14376879218804361, 0.10320537793448326, 0.062075348274484465, 0.9239058295225738, 0.6248259352064043, 0.986631674495411, 0.018596247461475035, 0.15166693582104696, 0.42173225278264337, 0.16689397261334493, 0.008866349112589988, 0.572804619573544, 0.430441998501356, 0.536550146330635, 0.957089714636956, 0.38186831745096783, 0.7351461735077244, 0.3318916813119467, 0.493578402193262, 0.4782039943127633, 0.3181929555999644, 0.24528675938831934, 0.4268326385457143, 0.30661388505071296, 0.946964948673893, 0.3855862070605026, 0.06836886504685658, 0.29075809188223356, 0.9305872148143691, 0.5932105232485857, 0.7498502915643704, 0.6163380335171947, 0.7555147051747044, 0.43468193813208067, 0.8111624254490857, 0.008478823637769639, 0.08245499984902227, 0.8887756983251442, 0.590762949905626, 0.7863012800553902, 0.17057581325372229, 0.6496403497145227, 0.6566266080499764, 0.982851351381304, 0.3040266949075473, 0.47889815424706283, 0.511224426190844, 0.6557748259246702, 0.3451254172182302, 0.8886812062822183, 0.6492765046595118, 0.1792956354083327, 0.034895728245662005, 0.967031681669515, 0.7227974874412443, 0.6442829490219677, 0.6601552312826073, 0.37687400849607355, 0.553977419498826, 0.15487690329452697, 0.11587738730911068, 0.4203627933314016, 0.9794675089535745, 0.25694107988571746, 0.14751340734990426, 0.4663187655241626, 0.31956915781867945, 0.7280122141391235, 0.07122210786147998, 0.4724589065277359, 0.20375523823897002, 0.8506954314795311, 0.8454480222973477, 0.03397687883379774, 0.4134012788162046, 0.42348262036710227, 0.7544017444611643, 0.3960749484449463, 0.8927404392729135, 0.4015302141317483, 0.971832104606864, 0.9645941723436007, 0.7182694757878023, 0.8478226278977017, 0.5041772620535879, 0.7723366587714918, 0.2919564286458557, 0.23764661938216525, 0.09589700822638636, 0.35488333821696094, 0.6521756288832297, 0.7739601738834183, 0.3196128845538384, 0.5573472299870341, 0.5251755165832678, 0.29998902319370324, 0.3520744355120725, 0.4933278481227812, 0.6737549514108028, 0.108270310517252, 0.7294522963245825, 0.4822165249805669, 0.18467021925735716, 0.38948662337966844, 0.516199485153338, 0.19971377559278547, 0.9215568463777821, 0.26208140772516286, 0.782670320479252, 0.030068950718895926, 0.29016251217923694, 0.024018239648814554, 0.6875424772037083, 0.6722169079152306, 0.3426799223588608, 0.04850609208052847, 0.7222733634552824, 0.9640851565219735, 0.6916846470180601, 0.18663883520906943, 0.9447220329813467, 0.004497080922750363, 0.6241248718903103, 0.9531513763089714, 0.2460048344368726, 0.15926904074433468, 0.9101985020159321, 0.14649311414123056, 0.09822364226758529, 0.4469598116684852, 0.5230917974405315, 0.20936246733169428, 0.2146038848046813, 0.28335946997613215, 0.6504737598584965, 0.5333355049533152, 0.5905960499218592, 0.5399981107543405, 0.5271019759512119, 0.3302728158068893, 0.24159457483769964, 0.16823553381555012, 0.9307468292968506, 0.855463416120706, 0.6602190410952682, 0.32393796187559754, 0.32105294481370794, 0.8578582068737819, 0.2464898619128706, 0.9258386608027807, 0.8605331451847754, 0.1318745200571696, 0.28908190340278894, 0.925392976475749, 0.05813503816743315, 0.1512572016787176, 0.6419970682970503, 0.43689200644478077, 0.025974573261793532, 0.5865339205212146, 0.23260800587857566, 0.2554021069062534, 0.45040746566369005, 0.18154815629377907, 0.28779916498218827, 0.498563810648763, 0.34864239484450577, 0.13244958321782463, 0.6277317313213845, 0.13194755633974797, 0.6088218040115493, 0.5993113521229262, 0.09586774735576398, 0.43181274780562673, 0.7563227868263211, 0.9221328241213436, 0.18369720215712693, 0.011085616566620105, 0.3984561781632484, 0.9286140500452261, 0.9000306465226892, 0.8391781354805337, 0.6568979092449888, 0.39132468399716647, 0.6836701178630112, 0.4803940185027522, 0.791073388229723, 0.9168248876892079, 0.7115525521614687, 0.3797769677639715, 0.3768356192631238, 0.005081031367125899, 0.7721541064740819]}",
+  "valid": false
+ },
+ {
+  "id": "embedding/vector/0 = 1e308",
+  "schema": "embedding",
+  "text": "{\"model\": \"CLIP\", \"vector\": [1e308, 0.3928860881414771, 0.2927065034998443, 0.04427722162564385, 0.8620486085050627, 0.3979164773619779, 0.9380362132437956, 0.5511102320249636, 0.24684195328733172, 0.5849077235444989, 0.7638802608321855, 0.8755041402186888, 0.13221213345221194, 0.6573382522980222, 0.2749032866696507, 0.6629076544268617, 0.7965879607174466, 0.5537725230008717, 0.21675185581819245, 0.906065602689423, 0.8169241341436715, 0.8727080427751276, 0.4439201003564489, 0.9592329974927004, 0.5671052911407125, 0.43550812720623755, 0.6080475780563984, 0.5699140686433883, 0.9755421555618785, 0.8066507879548588, 0.628209533250657, 0.19416450083034686, 0.5922210248438123, 0.1120516799919119, 0.4260176598023282, 0.7301724591688036, 0.6844570005032309, 0.43340706589710687, 0.8398882872570546, 0.9947597661707648, 0.17281790439944422, 0.9277074824016571, 0.0009684766313903248, 0.9451350522378468, 0.3858452079523006, 0.6169073929713942, 0.5796626658338161, 0.24814779810714893, 0.10741993356074431, 0.8388887161608071, 0.49661960463652677, 0.37570236393057455, 0.9129246500006606, 0.7740942690031214, 0.2959808410407483, 0.5087960784536449, 0.16545762972739086, 0.194997757305726, 0.34644184840476877, 0.7262831886112979, 0.9561370002030498, 0.6070103815782784, 0.5425816631611362, 0.1185123819364009, 0.8738566377960817, 0.0819411799866121, 0.8715952140087467, 0.4899291863661732, 0.6233318673607056, 0.4998271392942655, 0.7353995459934561, 0.038686539440651924, 0.515844653472376, 0.7729882669658982, 0.9529743416429443, 0.8800247318307286, 0.08568906496178563, 0.5130722987942083, 0.1763106601487776, 0.6143913925908676, 0.0025205397151480957, 0.5556464099237614, 0.34113239715078214, 0.7618112619650587, 0.6364429358830379, 0.3018587692169026, 0.7203210139894279, 0.18644631149602953, 0.028865483803378167, 0.29621136294200956, 0.8715386841082103, 0.8588097213329796, 0.6803179392644656, 0.6663811516755945, 0.16569512703083134, 0.056450140155162254, 0.20467474668078955, 0.8630876242321872, 0.6189239961195248, 0.3388835327780404, 0.42709649310492614, 0.28336425238122553, 0.9202768337404648, 0.17914287686192165, 0.6792850293042347, 0.9172869030372179, 0.2767494680627237, 0.43582625465482216, 0.1478930332338062, 0.05797397831121509, 0.16505991891728677, 0.31106187418646514, 0.25371177000980993, 0.5447706787713746, 0.3721711266094829, 0.3972696736436304, 0.67405899668011, 0.963363835076907, 0.28167897320666513, 0.15060226580296, 0.8623115026811288, 0.5904454704094195, 0.05072953561479143, 0.4392719945478185, 0.5535471030002138, 0.1453368354613891, 0.5235287952504617, 0.9875633442131483, 0.7736829654232705, 0.944155567536851, 0.4756527895436381, 0.6865956686026452, 0.6679842422892658, 0.6934520856537957, 0.9748365925779123, 0.6854111002394248, 0.6319967057321316, 0.06557079571317703, 0.43151954301439377, 0.512613200946483, 0.8868081745829178, 0.739580136687667, 0.8995945613852749, 0.3229835770852667, 0.8334376293704442, 0.3455811192450624, 0.34957240635711173, 0.8993840667661874, 0.36557245157595386, 0.013220822765538043, 0.3721244874401951, 0.8379045105828918, 0.9832755899965988, 0.29695801261735555, 0.3619275001313005, 0.5154772153714071, 0.06917075226258751, 0.699020743032159, 0.13904339286894207, 0.9447965099492669, 0.6118579030199893, 0.8996363028431784, 0.8078308140999391, 0.9936357149377416, 0.023352467401376087, 0.3936934864359469, 0.42510660457709337, 0.05002587268073788, 0.1582071674744956, 0.5857380643766411, 0.9103787807813887, 0.39841612015939987, 0.9120034540758428, 0.32073301896450546, 0.6161298555811137, 0.47924555864608787, 0.489331728176124, 0.585527765278281, 0.94926094407286, 0.7940228326976644, 0.40432911318710063, 0.8691849695973565, 0.6333670936081254, 0.5068050950095979, 0.6255301757417557, 0.7940063250091692, 0.37775739023187915, 0.15806597271280076, 0.6342117366426379, 0.9068981423169652, 0.6171335829265029, 0.3726957561302625, 0.9441981766666824, 0.16963077145052619, 0.5137590371779257, 0.44576039701752457, 0.22305574133263806, 0.432295105895504, 0.263288074106906, 0.9629334989847157, 0.16584321757131582, 0.5549119711698555, 0.5248493521966581, 0.3878748268026537, 0.6138438592034866, 0.2033371340677016, 0.1082439005320065, 0.8434984528546631, 0.46177471852878704, 0.3275569400666237, 0.9181388868042923, 0.9352362501699887, 0.02229236806230528, 0.6584177428622306, 0.08506364694740509, 0.5997929607014989, 0.4903496997604935, 0.14569937295841673, 0.8175764210348218, 0.2785025174974717, 0.6943420944059983, 0.9418182352673502, 0.9729593745058315, 0.6830161693961333, 0.6343764437401818, 0.6956444028440391, 0.5550997703132665, 0.36606685578530795, 0.811974416156238, 0.31779527111875727, 0.03695049975608311, 0.7219657775068992, 0.7650254609716071, 0.5876129589062073, 0.8652540852281586, 0.17611272691903856, 0.21569775217219012, 0.7427589417598474, 0.8988051629007449, 0.8354844191944103, 0.6829972696012748, 0.3892516966295628, 0.5589191305726625, 0.005843774856633899, 0.6011335718136016, 0.6510792753073477, 0.8535481063787073, 0.3036123092200217, 0.8675710064778992, 0.03022088717332727, 0.42634492092051135, 0.5117833881436885, 0.8921740363945755, 0.7437489008743471, 0.004989024350583016, 0.13666861308045297, 0.34152167707837855, 0.8530153449763419, 0.3155272275771551, 0.2548880251680935, 0.3794245715441634, 0.7989865775397039, 0.4782402966959657, 0.5436962552420803, 0.8451815281914383, 0.3323750779827339, 0.14042444880021587, 0.23260681046471887, 0.08246263668989962, 0.8610127301283835, 0.8845213706321384, 0.04533177854958759, 0.3485019207240978, 0.21861642323918895, 0.2951038555218064, 0.06357253831321674, 0.25231640374217024, 0.15289627284340768, 0.48190840603888474, 0.04477803471851871, 0.6043154887648735, 0.15978168094708245, 0.7151854617290949, 0.9694643779390478, 0.7827973622130316, 0.26154029076140883, 0.727910495547946, 0.32906807723617626, 0.32847085090006956, 0.9615159318460949, 0.6785012544400671, 0.9202404071812904, 0.3045889493859505, 0.5231457664451223, 0.8145894180802276, 0.9900707231690478, 0.4548357924120462, 0.39941036494121285, 0.0006404957103453013, 0.9408044156860365, 0.4599424299852404, 0.244336200610774, 0.6690278616809016, 0.4492797209680215, 0.644406423620653, 0.21924893177549887, 0.5259692303814877, 0.8778814544484678, 0.48431155977764573, 0.33555904391997937, 0.30310246473017566, 0.2455845319963983, 0.02689565183872278, 0.8853109154524789, 0.7620193829216441, 0.18013292185434715, 0.15996828060920854, 0.2566814899886657, 0.1744976080945042, 0.2377422870457394, 0.9640340608113873, 0.8862540458332916, 0.6686674232847352, 0.7704724921914002, 0.26992496880012073, 0.5921355821775727, 0.29166921070928775, 0.6601178743235278, 0.48035958365322673, 0.5443489897861247, 0.037733783173298674, 0.19376037975658422, 0.8258328172638598, 0.7031288250363193, 0.47055493581183505, 0.08517608507956598, 0.9224122961741654, 0.7653474208632735, 0.4710082232634589, 0.8813299270792797, 0.7603360943773767, 0.2702188475777859, 0.0268534465878687, 0.10876875468216907, 0.3339909563875272, 0.3269863068126775, 0.7388962087164945, 0.75171614732691, 0.747370735446372, 0.31576631842388114, 0.8859784721106629, 0.7020384899207248, 0.3982005548797557, 0.2625412178679817, 0.36471000307031276, 0.6836944826104618, 0.30350099971445077, 0.7794293647264604, 0.3988888587666336, 0.7328728095056567, 0.9616308179143838, 0.820199337123817, 0.5829725694890002, 0.13109142887339065, 0.19453060804608624, 0.41853610632212745, 0.428117639611283, 0.26196470503229585, 0.5991663886891978, 0.40460254319836353, 0.3179632546569604, 0.1913776541283907, 0.42695432350100937, 0.38572527390045974, 0.8713592368664026, 0.19582092066359358, 0.6772990960005316, 0.8514786962770545, 0.294721824732207, 0.7937052548931274, 0.3234730335400079, 0.8537288818547456, 0.648033834135278, 0.7281187173713098, 0.5158452802873263, 0.4372754797563374, 0.5968372329769973, 0.2720171098308034, 0.46729484553552414, 0.9569040950216423, 0.426587820676964, 0.15050824713312938, 0.3626533997468101, 0.26965235365261153, 0.6815187885675372, 0.9588455642517077, 0.5505478989730719, 0.16464898951865037, 0.05527365361005132, 0.9379475289732668, 0.1144774464784667, 0.5135742397619041, 0.9940834140586009, 0.7041334048643889, 0.5459086546311472, 0.029733766696264263, 0.5466669730894426, 0.3677260538052357, 0.40538116864811724, 0.9387415831219998, 0.8996540619822558, 0.9297042023686727, 0.28094390989058315, 0.17673763529010722, 0.6396092703007015, 0.30724511864314197, 0.4941439364118555, 0.753915077732621, 0.3658444899140785, 0.05109853605495185, 0.584905774481102, 0.9722561911002139, 0.3125020700435587, 0.544132535830512, 0.8668995543432579, 0.8464693823843882, 0.27905361363003056, 0.704066318250066, 0.1346771663776951, 0.10475226980693786, 0.014087316406465433, 0.47355920384173555, 0.4469149800112511, 0.5797763184546287, 0.9696143467027472, 0.07985877470227265, 0.25098086353988136, 0.46285126967236045, 0.630794430251467, 0.7176253397571218, 0.6752198887849056, 0.14877815943128414, 0.6564423557284815, 0.6799518686164191, 0.7712751662777296, 0.22923888105372003, 0.04027585507807219, 0.22869252111369542, 0.5754913730019118, 0.5030741276588447, 0.75325256123783, 0.6236586330419585, 0.5539473892654003, 0.4117850529382897, 0.5711615598133031, 0.02598414046135178, 0.5605486707555856, 0.12022804022640143, 0.4215650690433904, 0.4783118979118526, 0.5402846931987778, 0.29091723929924906, 0.13803429146262214, 0.4033207779134995, 0.16564379252838723, 0.5267164165148921, 0.9682721255016712, 0.43712771511447157, 0.9553965237788896, 0.1519176098821936, 0.9556576667813319, 0.6917603411410133, 0.5196668490200929, 0.5730672163332315, 0.2366764154812908, 0.9969067173543045, 0.5551995564338973, 0.14029861641043062, 0.7725123883198465, 0.28778127142842524, 0.4245942430445543, 0.421604964819835, 0.7553524450229915, 0.7191331771577614, 0.5366508638081351, 0.1323977520590418, 0.6148406837788795, 0.5210688452300908, 0.875400547095993, 0.5273397558277674, 0.3655700279567532, 0.006023236635912865, 0.1742149814819176, 0.3926203930686889, 0.6946344773555259, 0.04380319514110609, 0.37966527005475526, 0.5456221779511897, 0.4105615358182714, 0.553947399586031, 0.520240946582033, 0.8031963017658026, 0.6207773892771005, 0.976518928450831, 0.19636936383110704, 0.8273059822418093, 0.9205282325920587, 0.47587737076388825, 0.24327715229957725, 0.680914501920244, 0.18803097362104104, 0.5066453201244097, 0.5537043362080176, 0.8621296205489517, 0.6225947966794444, 0.8855361242253936, 0.507675870916367, 0.46444717161102933, 0.27900247440564596, 0.12146894881837789, 0.5339230439532805, 0.2893243599536719, 0.4442333821716715, 0.18561428719997164, 0.022859520387686905, 0.5639682978775836, 0.4917942703587378, 0.9379664337816289, 0.155208873644599, 0.6441687461372617, 0.28515553615702305, 0.09431521858270775, 0.35183084628099903, 0.7977517717119945, 0.3150249723562545, 0.814509442279251, 0.9102205795297008, 0.9285873152077643, 0.15437577332274066, 0.028495248380122296, 0.7657918556989513, 0.10859623684721031, 0.23789241216306867, 0.6262818407310721, 0.8654466623038287, 0.2730251327088702, 0.35113846728334286, 0.8757017385950701, 0.8530419044838097, 0.885800508742564, 0.8133989232077341, 0.9331644209157145, 0.508629582875889, 0.2251255238445513, 0.04444873381235526, 0.32150369832378833, 0.9653341509208261, 0.7781593716052119, 0.19554175897163406, 0.24073284742672052, 0.5225803240908267, 0.8515501418094406, 0.4471147997675562, 0.6566725678764558, 0.4023497457832015, 0.12934449341807286, 0.1860454262704222, 0.800629242080977, 0.5653021985586297, 0.5995780273998301, 0.766344101274734, 0.0161713246266314, 0.8577897371552666, 0.17375678039004905, 0.3288169719189775, 0.14376879218804361, 0.10320537793448326, 0.062075348274484465, 0.9239058295225738, 0.6248259352064043, 0.986631674495411, 0.018596247461475035, 0.15166693582104696, 0.42173225278264337, 0.16689397261334493, 0.008866349112589988, 0.572804619573544, 0.430441998501356, 0.536550146330635, 0.957089714636956, 0.38186831745096783, 0.7351461735077244, 0.3318916813119467, 0.493578402193262, 0.4782039943127633, 0.3181929555999644, 0.24528675938831934, 0.4268326385457143, 0.30661388505071296, 0.946964948673893, 0.3855862070605026, 0.06836886504685658, 0.29075809188223356, 0.9305872148143691, 0.5932105232485857, 0.7498502915643704, 0.6163380335171947, 0.7555147051747044, 0.43468193813208067, 0.8111624254490857, 0.008478823637769639, 0.08245499984902227, 0.8887756983251442, 0.590762949905626, 0.7863012800553902, 0.17057581325372229, 0.6496403497145227, 0.6566266080499764, 0.982851351381304, 0.3040266949075473, 0.47889815424706283, 0.511224426190844, 0.6557748259246702, 0.3451254172182302, 0.8886812062822183, 0.6492765046595118, 0.1792956354083327, 0.034895728245662005, 0.967031681669515, 0.7227974874412443, 0.6442829490219677, 0.6601552312826073, 0.37687400849607355, 0.553977419498826, 0.15487690329452697, 0.11587738730911068, 0.4203627933314016, 0.9794675089535745, 0.25694107988571746, 0.14751340734990426, 0.4663187655241626, 0.31956915781867945, 0.7280122141391235, 0.07122210786147998, 0.4724589065277359, 0.20375523823897002, 0.8506954314795311, 0.8454480222973477, 0.03397687883379774, 0.4134012788162046, 0.42348262036710227, 0.7544017444611643, 0.3960749484449463, 0.8927404392729135, 0.4015302141317483, 0.971832104606864, 0.9645941723436007, 0.7182694757878023, 0.8478226278977017, 0.5041772620535879, 0.7723366587714918, 0.2919564286458557, 0.23764661938216525, 0.09589700822638636, 0.35488333821696094, 0.6521756288832297, 0.7739601738834183, 0.3196128845538384, 0.5573472299870341, 0.5251755165832678, 0.29998902319370324, 0.3520744355120725, 0.4933278481227812, 0.6737549514108028, 0.108270310517252, 0.7294522963245825, 0.4822165249805669, 0.18467021925735716, 0.38948662337966844, 0.516199485153338, 0.19971377559278547, 0.9215568463777821, 0.26208140772516286, 0.782670320479252, 0.030068950718895926, 0.29016251217923694, 0.024018239648814554, 0.6875424772037083, 0.6722169079152306, 0.3426799223588608, 0.04850609208052847, 0.7222733634552824, 0.9640851565219735, 0.6916846470180601, 0.18663883520906943, 0.9447220329813467, 0.004497080922750363, 0.6241248718903103, 0.9531513763089714, 0.2460048344368726, 0.15926904074433468, 0.9101985020159321, 0.14649311414123056, 0.09822364226758529, 0.4469598116684852, 0.5230917974405315, 0.20936246733169428, 0.2146038848046813, 0.28335946997613215, 0.6504737598584965, 0.5333355049533152, 0.5905960499218592, 0.5399981107543405, 0.5271019759512119, 0.3302728158068893, 0.24159457483769964, 0.16823553381555012, 0.9307468292968506, 0.855463416120706, 0.6602190410952682, 0.32393796187559754, 0.32105294481370794, 0.8578582068737819, 0.2464898619128706, 0.9258386608027807, 0.8605331451847754, 0.1318745200571696, 0.28908190340278894, 0.925392976475749, 0.05813503816743315, 0.1512572016787176, 0.6419970682970503, 0.43689200644478077, 0.025974573261793532, 0.5865339205212146, 0.23260800587857566, 0.2554021069062534, 0.45040746566369005, 0.18154815629377907, 0.28779916498218827, 0.498563810648763, 0.34864239484450577, 0.13244958321782463, 0.6277317313213845, 0.13194755633974797, 0.6088218040115493, 0.5993113521229262, 0.09586774735576398, 0.43181274780562673, 0.7563227868263211, 0.9221328241213436, 0.18369720215712693, 0.011085616566620105, 0.3984561781632484, 0.9286140500452261, 0.9000306465226892, 0.8391781354805337, 0.6568979092449888, 0.39132468399716647, 0.6836701178630112, 0.4803940185027522, 0.791073388229723, 0.9168248876892079, 0.7115525521614687, 0.3797769677639715, 0.3768356192631238, 0.005081031367125899, 0.7721541064740819]}",
+  "valid": false
+ },
+ {
+  "id": "geolocation/geometry/coordinates/2 = altitude 10^400 int",
+  "schema": "geolocation",
+  "text": "{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [-0.5895, 51.3814, 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000]}, \"properties\": {\"timestamp\": \"2025-09-17T11:45:00Z\", \"camera_make\": \"DJI\", \"camera_model\": \"Mavic 3 Pro\"}}",
+  "valid": false
+ },
+ {
+  "id": "geolocation/geometry/coordinates/2 = altitude 2^53+1",
+  "schema": "geolocation",
+  "text": "{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [-0.5895, 51.3814, 9007199254740993]}, \"properties\": {\"timestamp\": \"2025-09-17T11:45:00Z\", \"camera_make\": \"DJI\", \"camera_model\": \"Mavic 3 Pro\"}}",
+  "valid": false
+ },
+ {
+  "id": "geolocation/properties/n = foreign member 10^400 int",
+  "schema": "geolocation",
+  "text": "{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [-0.5895, 51.3814]}, \"properties\": {\"timestamp\": \"2025-09-17T11:45:00Z\", \"camera_make\": \"DJI\", \"camera_model\": \"Mavic 3 Pro\", \"n\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000}}",
+  "valid": false
+ },
+ {
+  "id": "regression/points/0/value = 10^400 int",
+  "schema": "regression",
+  "text": "{\"target\": \"temperature\", \"unit\": \"celsius\", \"producer\": \"WeatherForecaster-v2.1\", \"score_explanation\": \"Probability of observation falling within the interval.\", \"attributes\": {\"region\": \"London, UK\", \"model_version\": 2.1, \"deployment_id\": \"dep_88a9s8d\"}, \"points\": [{\"value\": 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"mean\", \"interval_lower\": 14.8, \"interval_upper\": 16.2, \"score\": 0.98}, {\"value\": 18.2, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"max\", \"attributes\": {\"description\": \"Peak heat spike\", \"is_anomaly\": true}}, {\"value\": null, \"timestamp\": \"2025-10-12T13:00:00Z\", \"attributes\": {\"status\": \"sensor_offline\"}}, {\"value\": 14.0, \"timestamp\": \"2025-10-12T14:00:00Z\", \"quantile_level\": 0.5, \"statistic\": \"quantile\"}]}",
+  "valid": false
+ },
+ {
+  "id": "regression/points/0/value = -10^400 int",
+  "schema": "regression",
+  "text": "{\"target\": \"temperature\", \"unit\": \"celsius\", \"producer\": \"WeatherForecaster-v2.1\", \"score_explanation\": \"Probability of observation falling within the interval.\", \"attributes\": {\"region\": \"London, UK\", \"model_version\": 2.1, \"deployment_id\": \"dep_88a9s8d\"}, \"points\": [{\"value\": -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"mean\", \"interval_lower\": 14.8, \"interval_upper\": 16.2, \"score\": 0.98}, {\"value\": 18.2, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"max\", \"attributes\": {\"description\": \"Peak heat spike\", \"is_anomaly\": true}}, {\"value\": null, \"timestamp\": \"2025-10-12T13:00:00Z\", \"attributes\": {\"status\": \"sensor_offline\"}}, {\"value\": 14.0, \"timestamp\": \"2025-10-12T14:00:00Z\", \"quantile_level\": 0.5, \"statistic\": \"quantile\"}]}",
+  "valid": false
+ },
+ {
+  "id": "regression/points/0/value = 1e400",
+  "schema": "regression",
+  "text": "{\"target\": \"temperature\", \"unit\": \"celsius\", \"producer\": \"WeatherForecaster-v2.1\", \"score_explanation\": \"Probability of observation falling within the interval.\", \"attributes\": {\"region\": \"London, UK\", \"model_version\": 2.1, \"deployment_id\": \"dep_88a9s8d\"}, \"points\": [{\"value\": 1e400, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"mean\", \"interval_lower\": 14.8, \"interval_upper\": 16.2, \"score\": 0.98}, {\"value\": 18.2, \"timestamp\": \"2025-10-12T12:00:00Z\", \"statistic\": \"max\", \"attributes\": {\"description\": \"Peak heat spike\", \"is_anomaly\": true}}, {\"value\": null, \"timestamp\": \"2025-10-12T13:00:00Z\", \"attributes\": {\"status\": \"sensor_offline\"}}, {\"value\": 14.0, \"timestamp\": \"2025-10-12T14:00:00Z\", \"quantile_level\": 0.5, \"statistic\": \"quantile\"}]}",
+  "valid": false
+ }
+]
