@@ -5,9 +5,11 @@ import copy
 import json
 import os
 import pickle
+import struct
 import subprocess
 import sys
 from collections.abc import Callable
+from enum import Enum
 from pathlib import Path
 from typing import Any, cast, get_args
 
@@ -308,7 +310,7 @@ def test_unhashable_check_formats_is_a_type_error(value: Any) -> None:
 def test_argument_types_are_checked_before_the_caches() -> None:
     from oatschema import _validation
 
-    _validation._lookup.cache_clear()
+    _validation.lookup.cache_clear()
     _validation._validator.cache_clear()
     record: Any = RECORD
     calls: list[Callable[[], object]] = [
@@ -320,7 +322,7 @@ def test_argument_types_are_checked_before_the_caches() -> None:
     for call in calls:
         with pytest.raises(TypeError):
             call()
-    assert _validation._lookup.cache_info().currsize == 0
+    assert _validation.lookup.cache_info().currsize == 0
     assert _validation._validator.cache_info().currsize == 0
 
 
@@ -366,7 +368,7 @@ def test_validation_error_reads_as_package_class() -> None:
         validate({"labels": [{"label": "cat", "score": 1.5}]}, "classification")
     error = caught.value
     assert repr(error).startswith("ValidationError(")
-    assert caught.exconly().startswith("oatschema.ValidationError: classification 0.8.0 at /labels/0/score: ")
+    assert caught.exconly().startswith("oatschema.ValidationError: classification 0.9.0 at /labels/0/score: ")
     for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
         data = pickle.dumps(error, protocol)
         assert b"oatschema._validation" not in data
@@ -387,7 +389,7 @@ def test_uncaught_validation_error_traceback_names_the_package() -> None:
     result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True)
     assert result.returncode == 1
     last = result.stderr.strip().splitlines()[-1]
-    assert last.startswith("oatschema.ValidationError: classification 0.8.0 at /labels/0/score: "), last
+    assert last.startswith("oatschema.ValidationError: classification 0.9.0 at /labels/0/score: "), last
 
 
 def test_swapped_arguments_traceback_is_a_clear_type_error() -> None:
@@ -451,3 +453,131 @@ def test_records_that_are_not_json_raise_type_error(record: Any) -> None:
 def test_check_formats_error_names_the_expected_call(call: Callable[..., Any]) -> None:
     with pytest.raises(TypeError, match=rf"; expected {call.__name__}\(record, name, version=None"):
         call(RECORD, "classification", check_formats=1)
+
+
+FORMAT_VERDICTS = json.loads((Path(__file__).parent / "data" / "format_verdicts.json").read_text(encoding="utf-8"))
+
+
+def format_record(kind: str, value: str) -> dict[str, Any]:
+    if kind == "date-time":
+        return {"labels": [{"label": "x", "timestamp": value}]}
+    return {"labels": [{"label": "x"}], "vocabulary_url": value}
+
+
+def test_format_verdicts_match_the_javascript_build() -> None:
+    wrong = [
+        (case["format"], case["value"])
+        for case in FORMAT_VERDICTS
+        if is_valid(format_record(case["format"], case["value"]), "classification") is not case["valid"]
+    ]
+    assert wrong == []
+
+
+@pytest.mark.parametrize("version", ["0.7.0", "0.8.0", "0.9.0"])
+@pytest.mark.parametrize(
+    "value",
+    [
+        "-----11-06T10:00:00Z",
+        "+,-./11-06T10:00:00Z",
+        "2026-11-0/T10:00:00Z",
+        "2026-11-06T1,:00:00Z",
+        "2026-11-06T10:0.:00Z",
+        "2026-11-06T10:00:0/Z",
+        "2026-11-06T10:00:00+0.:00",
+        "2026-11-06T10:00:00+00:0-",
+        "٢٠٢٦-11-06T10:00:00Z",
+        "2026-11-06T10:00:00Z\n",
+    ],
+)
+def test_date_time_with_a_non_digit_is_invalid(value: str, version: str) -> None:
+    record = format_record("date-time", value)
+    assert not is_valid(record, "classification", version)
+    assert is_valid(record, "classification", version, check_formats=False)
+    errors = list(iter_errors(record, "classification", version))
+    assert [error.keyword for error in errors] == ["format"]
+    assert value not in str(errors[0])
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["2026-11-06T10:00:00Z", "2026-11-06t10:00:00z", "2024-02-29T00:00:00+05:30", "2026-12-31T23:59:60Z"],
+)
+def test_date_time_still_accepts_real_times(value: str) -> None:
+    assert is_valid(format_record("date-time", value), "classification")
+
+
+SURROGATE_RECORDS: list[tuple[Any, tuple[str | int, ...]]] = [
+    ({"labels": [], "vocabulary": ["a", "\ud800"]}, ("vocabulary", 1)),
+    ({"labels": [], "producer": "\ud800"}, ("producer",)),
+    ({"labels": [], "producer": "x" * 5000 + "\udfff"}, ("producer",)),
+    ({"labels": [{"label": "\udc00"}]}, ("labels", 0, "label")),
+    ({"labels": [{"label": "x", "attributes": {"\ud800": 1}}]}, ("labels", 0, "attributes", "\ud800")),
+    ({"labels": [], "\ud800": 1}, ("\ud800",)),
+    ({"labels": [], "vocabulary": ("a", "\ud800")}, ("vocabulary", 1)),
+    ({"labels": [], "producer": "\ud83d" + "\ude00"}, ("producer",)),
+    ("\ud800", ()),
+    (["\ud800"], (0,)),
+]
+
+
+class StrSubclass(str):
+    pass
+
+
+@pytest.mark.parametrize("version", ["0.5.0", "0.8.0", "0.9.0"])
+@pytest.mark.parametrize(("record", "path"), SURROGATE_RECORDS)
+def test_unpaired_surrogate_is_invalid(record: Any, path: tuple[str | int, ...], version: str) -> None:
+    assert is_valid(record, "classification", version) is False
+    assert is_valid(record, "classification", version, check_formats=False) is False
+    with pytest.raises(ValidationError) as caught:
+        validate(record, "classification", version)
+    assert caught.value.path == path
+    assert caught.value.keyword == ""
+    assert "surrogate" in caught.value.message
+    assert [error.path for error in iter_errors(record, "classification", version)] == [path]
+    str(caught.value).encode("utf-8")
+    assert pickle.loads(pickle.dumps(caught.value)).path == path
+
+
+def test_every_unpaired_surrogate_is_reported() -> None:
+    record = {"labels": [{"label": "\ud800"}, {"label": "\udc00"}], "producer": "\udfff"}
+    assert {error.path for error in iter_errors(record, "classification")} == {
+        ("labels", 0, "label"),
+        ("labels", 1, "label"),
+        ("producer",),
+    }
+
+
+def test_surrogate_in_a_type_the_fast_scan_cannot_read_is_found() -> None:
+    assert is_valid({"labels": [], "producer": StrSubclass("\ud800")}, "classification") is False
+    with pytest.raises(TypeError, match="JSON data"):
+        is_valid({"labels": [], "producer": StrSubclass("fine")}, "classification")
+
+
+def test_surrogate_in_a_plain_enum_is_found() -> None:
+    class Text(Enum):
+        LONE = "\ud800"
+
+    record = {"labels": [{"label": "x", "attributes": {"n": Text.LONE}}]}
+    assert is_valid(record, "classification") is False
+    assert [error.path for error in iter_errors(record, "classification")] == [("labels", 0, "attributes", "n")]
+
+
+def test_surrogate_scan_does_not_flag_bytes_that_look_like_one() -> None:
+    lookalike = struct.unpack("<d", b"\xed\xa0\x80\x00\x00\x00\xe0\x3f")[0]
+    record = {"labels": [{"label": "໐퟿😀", "score": lookalike, "attributes": {"n": lookalike}}]}
+    assert is_valid(record, "classification") is True
+
+
+def test_paired_escapes_from_json_text_are_one_valid_character() -> None:
+    assert is_valid(json.loads('{"labels": [{"label": "\\ud83d\\ude00"}]}'), "classification") is True
+
+
+def test_surrogate_scan_ends_on_cyclic_and_deep_records() -> None:
+    cyclic: list[Any] = ["\xed"]
+    cyclic.append(cyclic)
+    deep: list[Any] = []
+    for _ in range(100_000):
+        deep = [deep]
+    for record in (cyclic, deep):
+        assert not is_valid(record, "classification")

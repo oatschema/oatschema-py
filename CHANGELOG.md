@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0.0 (2026-11-06)
+
+Bundles OATS 0.9.0, so `SCHEMA_VERSION` is now `"0.9.0"` and the bundled versions are 0.4.0 to 0.9.0. Earlier versions are unchanged. See the [OATS changelog](https://github.com/oatschema/oats/blob/main/CHANGELOG.md) for what the schemas changed: most importantly, every number is bounded within ±(2^53−1), and `llm-output` `seed` is a string.
+
+**Pin:** `oatschema[validate]>=0.9.0.0,<0.10`. A consumer pinned `<0.9` stays on 0.8.0.2 until it widens the pin, and should pass `version` explicitly if its records aren't written for 0.9.0.
+
+### Breaking
+
+- `validate`, `is_valid` and `iter_errors`, with no `version`, now check against 0.9.0.
+- A `date-time` with a non-digit where a digit belongs, such as `-----11-06T10:00:00Z`, is now invalid in every schema version, unless `check_formats=False`. jsonschema-rs accepted some of `+ , - . /` there. oatschema now checks `date-time` itself, with the same rules as oatschema-js. Each timestamp in a record takes about 2 to 3 µs longer to check.
+- A string or property name with an unpaired surrogate, such as `"\ud800"`, is now invalid in every schema version, even with `check_formats=False`, because RFC 7493 forbids them. Before, some such records raised `TypeError` and others were reported valid. The error's `path` locates it, and its `keyword` and `schema_path` are empty. For such a record, `iter_errors` reports only the surrogates. oatschema-js, and other JSON Schema validators, still accept them. Every record is scanned first, which adds about 1 µs to a small record and about 70 µs to a 1,536-float embedding.
+- The `validate` extra now needs `jsonschema-rs>=0.58`, up from 0.38. Before 0.49, it accepted infinity (a literal such as `1e400`) in a bounded field, and before 0.58 it reported some non-JSON values as invalid rather than raising `TypeError`.
+
+### Added
+
+- `check_numbers(record, name, version=None, *, on_bad_number="drop", check_formats=True)` returns a `CheckedRecord(record, dropped, converted)`, for making a record's numbers safe before writing it. It works on every schema version and never rounds. Conversions keep the value exactly: numpy values to Python ones, `-0.0` to `0.0`, a whole float in an `integer` field to an int, and, from 0.9.0, an int `seed` to a string. A bad number (NaN, ±infinity, beyond ±(2^53−1), or outside its field's bounds) under a property is dropped, reported in `dropped` and with a `DroppedNumberWarning`. In a list, or in a required property, it rejects the record with `ValidationError`, as any bad number does with `on_bad_number="raise"`.
+- New public types: `CheckedRecord`, `DroppedNumber`, `ConvertedNumber` and `DroppedNumberWarning`.
+- `ValidationError`'s `schema_path` and `keyword` may be empty, for a check no schema keyword expresses. `str()` escapes unpaired surrogates in `path`, so it can always be printed.
+- The sync script rejects a schema named `tools`, as OATS 0.9.0 does.
+
 ## 0.8.0.2 (2026-10-30)
 
 No schema changes: the bundled schema versions are still 0.4.0 to 0.8.0. Nothing breaks: every call whose arguments have the documented types behaves as in 0.8.0.1.
