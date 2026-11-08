@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections.abc import Callable
+from enum import Enum
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pytest
 
 import oatschema
@@ -195,3 +197,23 @@ def test_is_valid_says_false_for_a_record_that_contains_itself() -> None:
     cyclic: list[Any] = []
     cyclic.append(cyclic)
     assert is_valid({"labels": [], "attributes": {"k": cyclic}}, "classification") is False
+
+
+class _Text(str):
+    pass
+
+
+class _Pair(Enum):
+    ONE = (1, 2)
+
+
+@pytest.mark.parametrize("leaf", [np.float64(0.5), np.str_("a"), _Text("a"), (1,), _Pair.ONE, {_Text("k"): 1}])
+def test_a_deep_leaf_gets_the_answer_a_shallow_one_gets(leaf: Any) -> None:
+    def outcome(depth: int) -> str:
+        try:
+            validate({"labels": [], "attributes": {"k": lists(depth, leaf)}}, "classification")
+        except Exception as error:
+            return type(error).__name__
+        return "valid"
+
+    assert outcome(300) == outcome(10)

@@ -134,36 +134,58 @@ def _surrogate_paths(record: Any) -> Iterator[tuple[str | int, ...]]:
     return _surrogates(record)
 
 
+_NOT_JSON = "the record must be JSON data (dict, list, str, int, float, bool or None)"
+
+
+def _resolved(value: Any) -> Any:
+    while isinstance(value, Enum):
+        inner = value.value
+        if inner is value:
+            raise TypeError(f"{_NOT_JSON}: an Enum value resolves to itself")
+        value = inner
+    return value
+
+
+def _is_container(value: Any) -> bool:
+    return isinstance(value, (dict, list)) or type(value) is tuple
+
+
 def _scalar_digest(value: Any) -> bytes:
-    if isinstance(value, Enum) and not isinstance(value, (str, int, float)):
-        value = value.value
+    kind = type(value)
     if value is None:
         text = b"null"
-    elif value is True or value is False:
+    elif kind is bool:
         text = b"true" if value else b"false"
-    elif isinstance(value, int):
-        text = b"n" + int.__repr__(value).encode()
-    elif isinstance(value, float):
-        number = float(value)
-        text = b"n" + (int.__repr__(int(number)) if number.is_integer() else float.__repr__(number)).encode()
-    elif isinstance(value, str):
+    elif kind is int:
+        text = b"n" + repr(value).encode()
+    elif kind is float:
+        text = b"n" + (repr(int(value)) if value.is_integer() else repr(value)).encode()
+    elif kind is str:
         text = b"s" + value.encode("utf-8", "surrogatepass")
     else:
-        raise TypeError("the record must be JSON data (dict, list, str, int, float, bool or None)")
+        raise TypeError(_NOT_JSON)
     return hashlib.sha256(text).digest()
+
+
+def _key(key: Any) -> str:
+    if type(key) is str:
+        return key
+    if isinstance(key, Enum) and isinstance(key, str):
+        return str(key.value)
+    raise TypeError(f"{_NOT_JSON}: a property name is not a str")
 
 
 def _container_digest(value: Any, digests: dict[int, bytes]) -> bytes:
     def child(item: Any) -> bytes:
-        return digests[id(item)] if isinstance(item, _CONTAINERS) else _scalar_digest(item)
+        item = _resolved(item)
+        return digests[id(item)] if _is_container(item) else _scalar_digest(item)
 
     if isinstance(value, dict):
-        if not all(isinstance(key, str) for key in value):
-            raise TypeError("the record must be JSON data: a property name is not a str")
+        entries = sorted((_key(key), item) for key, item in value.items())
         digest = hashlib.sha256(b"{")
-        for key in sorted(value):
+        for key, item in entries:
             encoded = key.encode("utf-8", "surrogatepass")
-            digest.update(len(encoded).to_bytes(8, "big") + encoded + child(value[key]))
+            digest.update(len(encoded).to_bytes(8, "big") + encoded + child(item))
     else:
         digest = hashlib.sha256(b"[")
         for item in value:
@@ -172,7 +194,8 @@ def _container_digest(value: Any, digests: dict[int, bytes]) -> bytes:
 
 
 def _stand_in(value: Any) -> str:
-    if not isinstance(value, _CONTAINERS):
+    value = _resolved(value)
+    if not _is_container(value):
         return _MASK + _scalar_digest(value).hex()
     digests: dict[int, bytes] = {}
     open_containers: set[int] = set()
@@ -185,11 +208,11 @@ def _stand_in(value: Any) -> str:
             digests[ident] = _container_digest(node, digests)
         elif ident not in digests:
             if ident in open_containers:
-                raise TypeError("the record must be JSON data: it contains itself")
+                raise TypeError(f"{_NOT_JSON}: it contains itself")
             open_containers.add(ident)
             stack.append((node, True))
             children = node.values() if isinstance(node, dict) else node
-            stack.extend((item, False) for item in children if isinstance(item, _CONTAINERS))
+            stack.extend((item, False) for item in map(_resolved, children) if _is_container(item))
     return _MASK + digests[id(value)].hex()
 
 
@@ -202,20 +225,21 @@ def stand_in_deep_values(value: Any, *, depth: int = 0) -> Any:
     """
     if depth == STAND_IN_DEPTH:
         return _stand_in(value)
-    if isinstance(value, dict):
+    resolved = _resolved(value)
+    if isinstance(resolved, dict):
         changed = {}
-        for key, item in value.items():
+        for key, item in resolved.items():
             new = stand_in_deep_values(item, depth=depth + 1)
             if new is not item:
                 changed[key] = new
-        return {**value, **changed} if changed else value
-    if isinstance(value, (list, tuple)):
-        if depth + 1 < STAND_IN_DEPTH and _SCALAR_TYPES.issuperset(map(type, value)):
-            return value
-        items = [stand_in_deep_values(item, depth=depth + 1) for item in value]
-        if all(new is old for new, old in zip(items, value, strict=True)):
-            return value
-        return tuple(items) if isinstance(value, tuple) else items
+        return {**resolved, **changed} if changed else resolved
+    if isinstance(resolved, list) or type(resolved) is tuple:
+        if depth + 1 < STAND_IN_DEPTH and _SCALAR_TYPES.issuperset(map(type, resolved)):
+            return resolved
+        items = [stand_in_deep_values(item, depth=depth + 1) for item in resolved]
+        if all(new is old for new, old in zip(items, resolved, strict=True)):
+            return resolved
+        return tuple(items) if type(resolved) is tuple else items
     return value
 
 

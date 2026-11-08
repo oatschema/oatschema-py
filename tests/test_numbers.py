@@ -822,3 +822,13 @@ def test_conditions_that_refer_elsewhere_use_every_error() -> None:
             "properties": {"x": {"type": "number", "maximum": 5, "anyOf": [{"minimum": 0}]}},
         }
     ) == {"additionalProperties": True, "properties": {"x": {"maximum": 5}}}
+
+
+def test_numpy_object_arrays_that_contain_each_other_raise_type_error() -> None:
+    alone = np.empty(1, dtype=object)
+    alone[0] = alone
+    first, second = np.empty(1, dtype=object), np.empty(1, dtype=object)
+    first[0], second[0] = second, first
+    for array in (alone, first):
+        with pytest.raises(TypeError, match="contains itself"):
+            check_numbers({"labels": [], "attributes": {"k": array}}, "classification")

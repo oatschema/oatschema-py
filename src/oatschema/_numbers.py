@@ -420,16 +420,18 @@ class _Walk:
                         self.converted.append(_Change(_Where(frame, slot), item, copied))
                     frame.place(slot, copied)
                     continue
-                if id(plain) in open_containers:
+                if id(plain) in open_containers or id(item) in open_containers:
                     raise TypeError("the record must be JSON data: it contains itself")
                 child = _Frame(item, plain, frame, slot)
                 frame.place(slot, child.result)
                 frames.append(child)
                 open_containers.add(id(plain))
+                open_containers.add(id(item))
                 break
             else:
                 frames.pop()
                 open_containers.discard(id(frame.plain))
+                open_containers.discard(id(frame.original))
                 finished = frame.finish()
                 if frame.holder is not None and finished is not frame.result:
                     frame.holder[frame.slot] = finished
