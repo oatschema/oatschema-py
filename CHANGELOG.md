@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.9.0.1 (unreleased)
+
+No schema changes: the bundled schema versions are still 0.4.0 to 0.9.0. Nothing breaks. Every record gets the same verdict as in 0.9.0.0, and `check_numbers` drops, converts, warns and raises exactly as before, except for the deep records below, which used to raise `TypeError`. The pin is still `oatschema[validate]>=0.9.0.0,<0.10`.
+
+### Fixed
+
+- **Deep records get a verdict.** An invalid record whose failing value was nested 256 or more levels deep made `validate`, `iter_errors` and the `Validator` methods raise `TypeError: the record must be JSON data … Recursion limit reached`. So did `is_valid`, for an array checked by `uniqueItems` (such as `vocabulary`) whose items were that deep. `check_numbers` did the same, and also raised `TypeError` ("nested too deeply") for any record more than about 1,000 levels deep. Now every entry point gives a verdict at any depth (tested to 100,000 levels): `validate` raises `ValidationError` exactly when `is_valid` returns `False`, and the errors are the ones the same record would get if it were shallow. `TypeError` still means only that the record isn't JSON data; a record that contains itself raises it from `validate`, `iter_errors` and `check_numbers`, while `is_valid` returns `False`, as in 0.9.0.0. No bundled schema describes a value more than 8 levels deep, so a record nested deeper than that is always invalid.
+- The cause is a limit in jsonschema-rs, which stops at 255 levels when it converts a value to build an error or to compare `uniqueItems`: UPSTREAM_ISSUE_URL. oatschema works around it by validating again with every value 64 levels down replaced by a str that is equal to another only when the two values are equal as JSON, so `uniqueItems` decides as it would. Numbers beyond ±(2^53−1), and NaN, may compare differently there than in jsonschema-rs, which can change whether a `uniqueItems` error is reported, but not the verdict. This costs nothing unless jsonschema-rs reaches its limit.
+- **`check_numbers` is faster and needs less memory.** It no longer works out the schema for every value it visits. It checks lists of clean numbers or strings, and lists of objects with the same keys, in a few passes each, and it validates a clean record once instead of twice. On a valid record it now costs at most about 4 times `is_valid`, where it cost up to about 28 times. Measured on an AMD Ryzen 5 3600 (WSL2), Python 3.15.2, jsonschema-rs 0.60.3, CPU time, best of three or more runs:
+
+  | Record | `is_valid` | `check_numbers` in 0.9.0.0 | `check_numbers` now |
+  | :--- | ---: | ---: | ---: |
+  | valid `document-extraction`, 2,000 polygons of 1,000 vertices (4,000,000 numbers) | 1.3 s, 214 MB | 25.5 s, 736 MB | 4.3 s, 630 MB |
+  | the same with 200 polygons (400,000 numbers) | 0.12 s, 25 MB | 2.4 s, 87 MB | 0.31 s, 80 MB |
+  | valid `classification`, 10,000 `{label, score}` labels | 3.6 ms | 102 ms | 10 ms |
+  | valid `embedding`, 16,384 floats | 2.3 ms | 40 ms | 5.1 ms |
+  | valid `generic`, 128 properties | 0.05 ms | 2.1 ms | 0.1 ms |
+
+  The memory figures are the peak growth over the record itself. The result is still a full copy of the record, so on a large record of many small objects that copy is most of what `check_numbers` adds.
+
+  An invalid record costs about what a valid one of the same size does, plus the cost of its errors. `check_numbers` visits every value before it raises, because its error names what it dropped, so it can't stop at the first error as `validate` does. To find numbers outside bounds set in `if`/`then` branches (`document-extraction`, `entity-extraction` and `object-detection`, for normalized units), it now asks jsonschema-rs only for bound errors, not for every error, and other schemas skip that step. On a 4,000,000-number `document-extraction` whose 2,000 blocks each lack a required property, it takes 4.8 s, down from 224 s (`validate` takes 0.3 s, `is_valid` 0.3 s). On a record that exceeds a size limit, `validate` is itself slow, because jsonschema-rs converts the whole failing value to build its error: for a 1,000,000-property `generic`, a 4,000,000-float `embedding` and 1,000,000 labels, `validate` takes 2.0, 5.5 and 2.7 s, and `check_numbers` 2.8, 6.6 and 4.0 s, down from about 25 s each.
+
+### Corrections to the 0.9.0.0 entry
+
+- It said oatschema-js still accepts unpaired surrogates. oatschema-js 0.2.0, released the same day, rejects them too. Other JSON Schema validators still accept them.
+
 ## 0.9.0.0 (2026-11-06)
 
 Bundles OATS 0.9.0, so `SCHEMA_VERSION` is now `"0.9.0"` and the bundled versions are 0.4.0 to 0.9.0. Earlier versions are unchanged. See the [OATS changelog](https://github.com/oatschema/oats/blob/main/CHANGELOG.md) for what the schemas changed: most importantly, every number is bounded within ±(2^53−1), and `llm-output` `seed` is a string.

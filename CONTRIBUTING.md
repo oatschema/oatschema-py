@@ -13,6 +13,8 @@ uv run mypy src tests scripts
 
 The release-example tests validate every bundled version against that release's positive and negative examples. They read the tags from a checkout of oats, which defaults to `~/projects/oats`; set `OATS_REPO` to point elsewhere. Without a checkout they are skipped.
 
+The cost tests check that `check_numbers` takes at most 4 times as long as `is_valid` on valid records of several shapes. They take about 10 seconds and depend on the machine, so they only run with `OATSCHEMA_COST_TESTS=1`.
+
 ## Package versions
 
 The package version is `a.b.c.d`. `a.b.c` is the newest bundled schema version (`oatschema.SCHEMA_VERSION`), and `d` is the package's own revision. See the README for how users should pin.
