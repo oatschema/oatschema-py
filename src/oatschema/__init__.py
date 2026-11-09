@@ -7,7 +7,7 @@ from oatschema._numbers import CheckedRecord, ConvertedNumber, DroppedNumber, Dr
 from oatschema._schemas import LEGACY_VERSIONS, SCHEMA_VERSION, SchemaName, available_versions, get_schema
 from oatschema._validation import ValidationError, Validator, get_validator, is_valid, iter_errors, validate
 
-__version__ = "0.9.0.0"
+__version__ = "0.9.0.1"
 
 __all__ = [
     "CheckedRecord",
