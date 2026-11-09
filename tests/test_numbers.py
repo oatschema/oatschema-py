@@ -366,6 +366,42 @@ def test_non_str_key_is_refused_whatever_its_value(value: float) -> None:
         check_numbers({"labels": [], "attributes": {1: value}}, "classification")
 
 
+class Text(str):
+    pass
+
+
+class Whole(int):
+    pass
+
+
+class Real(float):
+    pass
+
+
+@pytest.mark.parametrize(
+    "record",
+    [
+        {"vocabulary": 7, "labels": [{"label": Text("cat")}]},
+        {"vocabulary": 7, "labels": [{"label": "cat", "score": Real(0.5)}]},
+        {"vocabulary": 7, "labels": [{"label": "cat"}], "attributes": {"n": Whole(1)}},
+        {"vocabulary": 7, "labels": [{Text("label"): "cat"}]},
+        {"vocabulary": 7, "labels": [{"label": "cat"}, {Text("label"): "dog"}]},
+        {"labels": [{"label": Text("cat"), "score": 1.5}]},
+        {"data": {"a": Text("x")}},
+    ],
+)
+@pytest.mark.parametrize("on_bad_number", ["drop", "raise"])
+def test_subclass_the_engine_refuses_raises_type_error_wherever_it_is(record: Any, on_bad_number: Any) -> None:
+    name: oatschema.SchemaName = "generic" if "data" in record else "classification"
+    with pytest.raises(TypeError, match="JSON data .*(Unsupported type|Dict key)"):
+        check_numbers(record, name, on_bad_number=on_bad_number)
+
+
+def test_bad_number_in_a_list_rejects_before_a_refused_subclass_is_found() -> None:
+    with pytest.raises(ValidationError, match="finite"):
+        check_numbers({"labels": [{"label": Text("cat")}], "vocabulary": [NAN]}, "classification")
+
+
 def test_warning_survives_a_value_too_large_to_show() -> None:
     value = np.array(10**5000, dtype=object)
     with pytest.warns(DroppedNumberWarning, match="value of type ndarray"):
@@ -793,8 +829,10 @@ def test_bounds_only_pass_finds_what_every_error_finds(version: str) -> None:
     validator = oatschema.get_validator("document-extraction", version)
     every = {error.path for error in validator.iter_errors(record) if error.keyword in _BOUND_KEYWORDS}
     assert len(every) >= 4
-    assert _bound_paths(record, validator) == every
-    assert _bound_paths({**record, "blocks": [*record["blocks"], {"text": "\ud800"}]}, validator) == set()
+    assert _bound_paths(record, validator, foreign=False) == every
+    assert (
+        _bound_paths({**record, "blocks": [*record["blocks"], {"text": "\ud800"}]}, validator, foreign=False) == set()
+    )
 
 
 def test_numbers_with_several_numeric_schemas_are_rechecked() -> None:

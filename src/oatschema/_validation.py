@@ -4,7 +4,9 @@
 import copyreg
 import hashlib
 import marshal
+import math
 import re
+import sys
 from collections.abc import Iterator
 from enum import Enum
 from functools import lru_cache
@@ -150,20 +152,56 @@ def _is_container(value: Any) -> bool:
     return isinstance(value, (dict, list)) or type(value) is tuple
 
 
+def _decimal_text(negative: bool, digits: str, exponent: int) -> bytes:
+    significant = digits.lstrip("0")
+    trimmed = significant.rstrip("0")
+    if not trimmed:
+        return b"n0"
+    exponent += len(significant) - len(trimmed)
+    return f"n{'-' if negative else ''}{trimmed}e{exponent}".encode()
+
+
+@lru_cache(maxsize=1)
+def _whole_floats_compare_exactly() -> bool:
+    return not _jsonschema_rs().validator_for({"const": 1e23}).is_valid(10**23)
+
+
+def _number_text(value: Any) -> bytes | None:
+    kind = type(value)
+    if kind is int:
+        try:
+            digits = str(abs(value))
+        except ValueError:
+            return None
+        return _decimal_text(value < 0, digits, 0)
+    if kind is float:
+        if not math.isfinite(value):
+            return None
+        if value.is_integer() and _whole_floats_compare_exactly():
+            return _decimal_text(value < 0, str(abs(int(value))), 0)
+        mantissa, _, power = repr(value).partition("e")
+        whole, _, fraction = mantissa.partition(".")
+        return _decimal_text(whole.startswith("-"), whole.lstrip("-") + fraction, int(power or 0) - len(fraction))
+    decimal = sys.modules.get("decimal")
+    if decimal is not None and kind is decimal.Decimal:
+        if not value.is_finite():
+            return None
+        sign, digits, exponent = value.as_tuple()
+        return _decimal_text(bool(sign), "".join(map(str, digits)), exponent)
+    raise TypeError(_NOT_JSON)
+
+
 def _scalar_digest(value: Any) -> bytes:
     kind = type(value)
     if value is None:
         text = b"null"
     elif kind is bool:
         text = b"true" if value else b"false"
-    elif kind is int:
-        text = b"n" + repr(value).encode()
-    elif kind is float:
-        text = b"n" + (repr(int(value)) if value.is_integer() else repr(value)).encode()
     elif kind is str:
         text = b"s" + value.encode("utf-8", "surrogatepass")
     else:
-        raise TypeError(_NOT_JSON)
+        number = _number_text(value)
+        text = f"u{id(value)}".encode() if number is None else number
     return hashlib.sha256(text).digest()
 
 
@@ -219,9 +257,12 @@ def _stand_in(value: Any) -> str:
 def stand_in_deep_values(value: Any, *, depth: int = 0) -> Any:
     """Return ``value`` with every value ``STAND_IN_DEPTH`` levels down replaced by a str.
 
-    Two replaced values get the same str when they are equal as JSON, comparing numbers by value, and otherwise
-    differ unless SHA-256 collides, so ``const``, ``enum`` and ``uniqueItems`` decide as they would on ``value``
-    for numbers within ±(2^53−1). Unchanged containers are shared with ``value``.
+    Two replaced values get the same str when jsonschema-rs finds them equal, and otherwise differ unless SHA-256
+    collides, so ``const``, ``enum`` and ``uniqueItems`` decide as they would on ``value``. Ints and ``Decimal`` compare
+    by exact value, and a float by its ``repr``, except that a whole float compares by its exact value where the
+    installed jsonschema-rs does so (0.61 and later); NaN, infinities and ints too long for decimal text equal only the
+    same object.
+    Unchanged containers are shared with ``value``.
     """
     if depth == STAND_IN_DEPTH:
         return _stand_in(value)

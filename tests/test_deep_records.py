@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections.abc import Callable
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from typing import Any, cast
@@ -207,13 +208,104 @@ class _Pair(Enum):
     ONE = (1, 2)
 
 
-@pytest.mark.parametrize("leaf", [np.float64(0.5), np.str_("a"), _Text("a"), (1,), _Pair.ONE, {_Text("k"): 1}])
-def test_a_deep_leaf_gets_the_answer_a_shallow_one_gets(leaf: Any) -> None:
-    def outcome(depth: int) -> str:
-        try:
-            validate({"labels": [], "attributes": {"k": lists(depth, leaf)}}, "classification")
-        except Exception as error:
-            return type(error).__name__
-        return "valid"
+class _Amount(Enum):
+    HALF = Decimal("0.5")
 
-    assert outcome(300) == outcome(10)
+
+LEAVES = [
+    np.float64(0.5),
+    np.str_("a"),
+    _Text("a"),
+    (1,),
+    _Pair.ONE,
+    {_Text("k"): 1},
+    Decimal("0.25"),
+    Decimal("NaN"),
+    Decimal("-Infinity"),
+    _Amount.HALF,
+    10**5000,
+    -(10**5000),
+    2**100,
+    float("nan"),
+    float("inf"),
+    -0.0,
+]
+
+
+def _leaf_id(value: Any) -> str:
+    if isinstance(value, int) and value.bit_length() > 64:
+        return f"int-{value.bit_length()}-bits"
+    return f"{type(value).__name__}-{value!r}"[:40]
+
+
+def _outcomes(record: Any) -> tuple[Any, ...]:
+    def shallow(errors: list[ValidationError]) -> list[tuple[str, int]]:
+        return sorted((error.keyword, min(len(error.path), 10)) for error in errors)
+
+    found: list[Any] = []
+    for call in (
+        lambda: is_valid(record, "classification"),
+        lambda: validate(record, "classification"),
+        lambda: shallow(list(iter_errors(record, "classification"))),
+    ):
+        try:
+            found.append(call())
+        except Exception as error:
+            found.append(type(error).__name__)
+    return tuple(found)
+
+
+@pytest.mark.parametrize("leaf", LEAVES, ids=_leaf_id)
+def test_a_deep_leaf_gets_the_answer_a_shallow_one_gets(leaf: Any) -> None:
+    def record(depth: int) -> dict[str, Any]:
+        return {"labels": [{"label": "a", "score": 0.5}], "attributes": {"k": lists(depth, leaf)}}
+
+    assert _outcomes(record(300)) == _outcomes(record(10))
+
+
+@pytest.mark.parametrize(
+    "leaf", [leaf for leaf in LEAVES if not isinstance(leaf, (np.generic, _Text, dict))], ids=_leaf_id
+)
+@pytest.mark.parametrize("twin", [True, False])
+def test_deep_vocabulary_items_compare_as_shallow_ones_do(leaf: Any, twin: bool) -> None:
+    def record(depth: int) -> dict[str, Any]:
+        item = lists(depth, leaf)
+        return {"labels": [], "vocabulary": [item, item if twin else lists(depth, leaf)]}
+
+    assert _outcomes(record(300)) == _outcomes(record(10))
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [
+        (Decimal("0.1"), 0.1),
+        (Decimal("1E+2"), 100),
+        (Decimal("0.10"), Decimal("0.1")),
+        (Decimal("-0"), 0),
+        (-0.0, 0),
+        (1e23, 10**23),
+        (1e23, int(1e23)),
+        (1e23, Decimal("1E+23")),
+        (1e23, Decimal(1e23)),
+        (0.1, Decimal(0.1)),
+        (1e16, 10**16),
+        (2**64, float(2**64)),
+        (2**100, 2**100),
+        (2**100, 2**100 + 1),
+        (Decimal("0.1000000000000000000001"), Decimal("0.1")),
+        (10**5000, 10**5000),
+        (float("nan"), float("nan")),
+        (True, 1),
+        (None, Decimal("NaN")),
+        ("1", 1),
+    ],
+    ids=lambda value: _leaf_id(value),
+)
+def test_stand_ins_are_equal_exactly_when_jsonschema_rs_finds_the_values_equal(first: Any, second: Any) -> None:
+    import jsonschema_rs
+
+    from oatschema._validation import _stand_in
+
+    unique = jsonschema_rs.validator_for({"uniqueItems": True})
+    assert (_stand_in([first]) == _stand_in([second])) is not unique.is_valid([[first], [second]])
+    assert (_stand_in([first]) == _stand_in([first])) is not unique.is_valid([[first], [first]])

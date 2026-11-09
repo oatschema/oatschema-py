@@ -13,7 +13,7 @@ uv run mypy src tests scripts
 
 The release-example tests validate every bundled version against that release's positive and negative examples. They read the tags from a checkout of oats, which defaults to `~/projects/oats`; set `OATS_REPO` to point elsewhere. Without a checkout they are skipped.
 
-The cost tests check that `check_numbers` takes at most 4 times as long as `is_valid` on valid records of several shapes with nothing to convert, and that its cost grows linearly with depth. They take about 10 seconds and depend on the machine, so they only run with `OATSCHEMA_COST_TESTS=1`.
+The cost tests check that `check_numbers` takes at most 4 times as long as `is_valid` on valid records with nothing to convert, or 5 times where each item holds a small object, for every schema the CHANGELOG makes that claim for, and that its cost grows linearly with depth. They take about 5 seconds and depend on the machine, so they only run with `OATSCHEMA_COST_TESTS=1`.
 
 ## Package versions
 

@@ -6,6 +6,7 @@ import sys
 import warnings
 from array import array
 from functools import lru_cache
+from itertools import chain
 from operator import itemgetter
 from collections.abc import Iterator
 from typing import Any, Literal, NamedTuple
@@ -36,6 +37,7 @@ _NOT_STR_KEY = f"the record must be JSON data: a property name is not a str: {_N
 _EXCLUSIVE = frozenset({"exclusiveMinimum", "exclusiveMaximum"})
 _TEXT_TYPES = frozenset({str, bool, type(None)})
 _NUMBER_TYPES = frozenset({int, float})
+_EXACT_TYPES = frozenset({dict, list, tuple, str, int, float, bool, type(None)})
 _NEGATIVE_ZERO = -(2**63)
 _WIDE = 16
 _FOLLOWED_MAPS = frozenset({"properties", "$defs"})
@@ -227,7 +229,7 @@ class _Plan:
         if len(shapes) != 1:
             return False
         keys = shapes.pop()
-        if not all(type(key) is str for key in keys):
+        if set(map(type, chain.from_iterable(values))) != {str}:
             return False
         return all(self.child(key).keeps_all(list(map(itemgetter(key), values))) for key in keys)
 
@@ -326,6 +328,7 @@ class _Walk:
         self.out_of_range: list[_Bad] = []
         self.out_of_bounds: list[_Bad] = []
         self.merged_bounds = False
+        self.foreign = False
 
     def visit(self, value: Any, plan: _Plan, path: _Location, parent: dict[Any, Any] | None, key: Any) -> Any:
         plain = _plain(value)
@@ -343,6 +346,8 @@ class _Walk:
             raise TypeError(f"the record must be JSON data (dict, list, str, int, float, bool or None): {_NOT_JSON}")
         if plain is not value or (checked is not plain and isinstance(plain, (int, float))):
             self.converted.append(_Change(path, value, checked))
+        if type(checked) not in _EXACT_TYPES:
+            self.foreign = True
         return checked
 
     def visit_object(self, value: dict[Any, Any], plan: _Plan, path: _Path) -> dict[Any, Any]:
@@ -356,8 +361,10 @@ class _Walk:
         result: dict[Any, Any] = {}
         known = plan.known
         for key, item in value.items():
-            if type(key) is not str and not isinstance(key, str):
-                raise TypeError(_NOT_STR_KEY)
+            if type(key) is not str:
+                if not isinstance(key, str):
+                    raise TypeError(_NOT_STR_KEY)
+                self.foreign = True
             child = known.get(key) or plan.child(key)
             kind = type(item)
             if kind is float:
@@ -404,8 +411,10 @@ class _Walk:
         while True:
             frame = frames[-1]
             for slot, item in frame.entries:
-                if isinstance(frame.result, dict) and not isinstance(slot, str):
-                    raise TypeError(_NOT_STR_KEY)
+                if isinstance(frame.result, dict) and type(slot) is not str:
+                    if not isinstance(slot, str):
+                        raise TypeError(_NOT_STR_KEY)
+                    self.foreign = True
                 if plan.keeps(item):
                     frame.place(slot, item)
                     continue
@@ -608,8 +617,10 @@ def _keyword(schema_path: Any) -> Any:
     return next((part for part in reversed(schema_path) if isinstance(part, str)), "")
 
 
-def _bound_paths(record: Any, validator: Validator) -> set[_Path]:
-    bounds = _bounds_validator(validator.schema_name, validator.schema_version, validator.check_formats)
+def _bound_paths(record: Any, validator: Validator, *, foreign: bool) -> set[_Path]:
+    bounds = (
+        None if foreign else _bounds_validator(validator.schema_name, validator.schema_version, validator.check_formats)
+    )
     if bounds is not None and not has_surrogate(record):
         try:
             errors = bounds.iter_errors(record)
@@ -620,8 +631,10 @@ def _bound_paths(record: Any, validator: Validator) -> set[_Path]:
     return {error.path for error in validator.iter_errors(record) if error.keyword in _BOUND_KEYWORDS}
 
 
-def _drop_overlay_bounds(record: Any, validator: Validator, on_bad_number: str, dropped: list[_Bad]) -> None:
-    for path in sorted(_bound_paths(record, validator), key=len, reverse=True):
+def _drop_overlay_bounds(
+    record: Any, validator: Validator, on_bad_number: str, dropped: list[_Bad], *, foreign: bool
+) -> None:
+    for path in sorted(_bound_paths(record, validator, foreign=foreign), key=len, reverse=True):
         parent, value = _value_at(record, path)
         holder = parent if isinstance(parent, dict) else None
         _drop(_Bad(path, value, _OUT_OF_BOUNDS, holder, path[-1] if path else None), on_bad_number, validator, dropped)
@@ -692,8 +705,8 @@ def check_numbers(
     if not validator.is_valid(checked):
         for bad in walk.out_of_bounds:
             _drop(bad, on_bad_number, validator, dropped)
-        if planner.hidden_bounds or walk.merged_bounds:
-            _drop_overlay_bounds(checked, validator, on_bad_number, dropped)
+        if planner.hidden_bounds or walk.merged_bounds or walk.foreign:
+            _drop_overlay_bounds(checked, validator, on_bad_number, dropped, foreign=walk.foreign)
         failure = _failure(checked, validator, dropped)
         if failure is not None:
             raise failure
