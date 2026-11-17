@@ -366,6 +366,42 @@ def test_non_str_key_is_refused_whatever_its_value(value: float) -> None:
         check_numbers({"labels": [], "attributes": {1: value}}, "classification")
 
 
+class Text(str):
+    pass
+
+
+class Whole(int):
+    pass
+
+
+class Real(float):
+    pass
+
+
+@pytest.mark.parametrize(
+    "record",
+    [
+        {"vocabulary": 7, "labels": [{"label": Text("cat")}]},
+        {"vocabulary": 7, "labels": [{"label": "cat", "score": Real(0.5)}]},
+        {"vocabulary": 7, "labels": [{"label": "cat"}], "attributes": {"n": Whole(1)}},
+        {"vocabulary": 7, "labels": [{Text("label"): "cat"}]},
+        {"vocabulary": 7, "labels": [{"label": "cat"}, {Text("label"): "dog"}]},
+        {"labels": [{"label": Text("cat"), "score": 1.5}]},
+        {"data": {"a": Text("x")}},
+    ],
+)
+@pytest.mark.parametrize("on_bad_number", ["drop", "raise"])
+def test_subclass_the_engine_refuses_raises_type_error_wherever_it_is(record: Any, on_bad_number: Any) -> None:
+    name: oatschema.SchemaName = "generic" if "data" in record else "classification"
+    with pytest.raises(TypeError, match="JSON data .*(Unsupported type|Dict key)"):
+        check_numbers(record, name, on_bad_number=on_bad_number)
+
+
+def test_bad_number_in_a_list_rejects_before_a_refused_subclass_is_found() -> None:
+    with pytest.raises(ValidationError, match="finite"):
+        check_numbers({"labels": [{"label": Text("cat")}], "vocabulary": [NAN]}, "classification")
+
+
 def test_warning_survives_a_value_too_large_to_show() -> None:
     value = np.array(10**5000, dtype=object)
     with pytest.warns(DroppedNumberWarning, match="value of type ndarray"):
@@ -373,14 +409,22 @@ def test_warning_survives_a_value_too_large_to_show() -> None:
     assert checked.record == {"labels": [], "attributes": {}}
 
 
-def test_deep_or_cyclic_record_raises_type_error() -> None:
+def test_cyclic_record_raises_type_error() -> None:
     cyclic: list[Any] = []
     cyclic.append(cyclic)
+    looped: dict[str, Any] = {"labels": []}
+    looped["labels"].append(looped)
+    for record in (cyclic, looped, {"labels": [], "attributes": {"k": cyclic}}):
+        with pytest.raises(TypeError, match="JSON data"):
+            check_numbers(record, "classification")
+
+
+def test_deep_record_is_invalid_not_a_type_error() -> None:
     deep: list[Any] = []
     for _ in range(100_000):
         deep = [deep]
-    for record in (cyclic, deep):
-        with pytest.raises(TypeError, match="JSON data"):
+    for record in (deep, {"labels": [], "attributes": {"k": deep}}, {"labels": [{"label": "a", "x": deep}]}):
+        with pytest.raises(ValidationError):
             check_numbers(record, "classification")
 
 
@@ -560,3 +604,269 @@ def test_walker_understands_every_applicator_in_the_bundled_schemas() -> None:
         for path in (Path(oatschema.__file__).parent / "schemas" / version).glob("*.json"):
             if path.name != "MANIFEST.json":
                 walk(get_schema(cast(Any, path.stem), version))
+
+
+def vector(values: Any, version: str = "0.9.0") -> CheckedRecord:
+    return check_numbers({"vector": values}, "embedding", version)
+
+
+def test_number_list_with_no_change_is_copied() -> None:
+    values = [0.5, -0.25, 1, 0.0, -1]
+    checked = vector(values)
+    assert checked == CheckedRecord({"vector": values}, (), ())
+    assert checked.record["vector"] is not values
+    assert [type(value) for value in checked.record["vector"]] == [float, float, int, float, int]
+
+
+def test_negative_zero_in_a_number_list_is_converted_where_it_is() -> None:
+    checked = vector([0.5, 0.0, -0.0, 1.0, -0.0])
+    assert checked.converted == (
+        ConvertedNumber(("vector", 2), -0.0, 0.0),
+        ConvertedNumber(("vector", 4), -0.0, 0.0),
+    )
+    assert all(math.copysign(1, value) == 1 for value in checked.record["vector"])
+
+
+@pytest.mark.parametrize("bad", [NAN, INF, -INF, 1e300, float(2**53), 2**53, 10**400])
+def test_bad_number_in_a_number_list_rejects_at_its_index(bad: float) -> None:
+    with pytest.raises(ValidationError) as caught:
+        vector([0.5, 0.25, bad, 0.75])
+    assert caught.value.path == ("vector", 2)
+
+
+def test_infinities_that_cancel_in_a_sum_still_reject() -> None:
+    with pytest.raises(ValidationError) as caught:
+        vector([0.5, INF, -INF])
+    assert caught.value.path == ("vector", 1)
+
+
+def test_finite_numbers_whose_sum_overflows_are_checked_one_by_one() -> None:
+    checked = vector([float(MAX), float(MAX)] * 2)
+    assert checked.converted == ()
+    with pytest.raises(ValidationError) as caught:
+        vector([1e308, 1e308])
+    assert caught.value.path == ("vector", 0)
+
+
+def test_whole_floats_in_an_integer_list_become_ints_in_order() -> None:
+    checked = vector({"dimensions": 8, "indices": [1.0, 2, 3.0], "values": [0.5, 0.5, 0.5]})
+    assert checked.record["vector"]["indices"] == [1, 2, 3]
+    assert [type(index) for index in checked.record["vector"]["indices"]] == [int, int, int]
+    assert checked.converted == (
+        ConvertedNumber(("vector", "indices", 0), 1.0, 1),
+        ConvertedNumber(("vector", "indices", 2), 3.0, 3),
+    )
+
+
+def test_bool_in_a_number_list_is_not_a_number() -> None:
+    with pytest.raises(ValidationError):
+        vector([0.5, True])
+
+
+def test_number_tuple_stays_a_tuple_and_list_subclass_becomes_a_list() -> None:
+    class Numbers(list[float]):
+        pass
+
+    assert vector((0.5, 0.25)).record["vector"] == (0.5, 0.25)
+    copied = vector(Numbers([0.5, 0.25])).record["vector"]
+    assert type(copied) is list and copied == [0.5, 0.25]
+
+
+def test_numpy_array_with_negative_zero_reports_the_value_then_the_array() -> None:
+    array = np.array([-0.0, 0.5])
+    checked = vector(array)
+    assert checked.record["vector"] == [0.0, 0.5]
+    assert [item.path for item in checked.converted] == [("vector", 0), ("vector",)]
+    assert checked.converted[1].before is array
+
+
+def test_list_of_like_objects_is_copied_object_by_object() -> None:
+    labels = [{"label": f"l{index}", "score": index / 10} for index in range(10)]
+    checked = check_numbers({"labels": labels}, "classification")
+    assert checked == CheckedRecord({"labels": labels}, (), ())
+    assert all(new is not old for new, old in zip(checked.record["labels"], labels, strict=True))
+
+
+@pytest.mark.parametrize("bad", [NAN, -0.0, 1.5, 2**60])
+def test_one_changed_value_in_a_list_of_like_objects_is_found(bad: float) -> None:
+    labels = [{"label": "a", "score": 0.5} for _ in range(5)]
+    labels[3] = {"label": "a", "score": bad}
+    checked = check_numbers({"labels": labels}, "classification")
+    changes = [*(item.path for item in checked.dropped), *(item.path for item in checked.converted)]
+    assert changes == [("labels", 3, "score")]
+    assert checked.record["labels"][:3] == labels[:3]
+
+
+def test_list_of_objects_with_different_keys_is_checked() -> None:
+    labels = [{"label": "a"}, {"label": "b", "score": -0.0}, {"score": 0.5, "label": "c"}]
+    checked = check_numbers({"labels": labels}, "classification")
+    assert checked.converted == (ConvertedNumber(("labels", 1, "score"), -0.0, 0.0),)
+    assert list(checked.record["labels"][2]) == ["score", "label"]
+
+
+def test_non_str_key_in_a_list_of_like_objects_is_refused() -> None:
+    with pytest.raises(TypeError, match="JSON data"):
+        check_numbers({"labels": [{"label": "a", 1: 0.5}, {"label": "b", 1: 0.5}]}, "classification")
+
+
+def test_positional_items_use_each_position_s_bounds() -> None:
+    def point(coordinates: Any) -> dict[str, Any]:
+        return {"type": "Feature", "geometry": {"type": "Point", "coordinates": coordinates}, "properties": {}}
+
+    checked = check_numbers(point([-0.0, 51.5, 1e15]), "geolocation")
+    assert checked.converted == (ConvertedNumber(("geometry", "coordinates", 0), -0.0, 0.0),)
+    with pytest.raises(ValidationError) as caught:
+        check_numbers(point([10.0, 91.0]), "geolocation", on_bad_number="raise")
+    assert caught.value.path == ("geometry", "coordinates", 1)
+
+
+def test_exclusive_bound_is_checked_exactly() -> None:
+    record = {"blocks": [], "unit": "px", "page_width": 0}
+    with pytest.raises(ValidationError):
+        check_numbers(record, "document-extraction", on_bad_number="raise")
+    assert check_numbers({**record, "page_width": 5e-324}, "document-extraction").dropped == ()
+
+
+def test_bad_number_no_schema_describes_is_found_at_any_depth() -> None:
+    nested: Any = [0.5, NAN]
+    for _ in range(3000):
+        nested = {"k": nested}
+    with pytest.raises(ValidationError) as caught:
+        check_numbers({"labels": [], "attributes": {"x": nested}}, "classification")
+    assert caught.value.path == ("attributes", "x", *["k"] * 3000, 1)
+    assert len(str(caught.value)) < 1500
+
+
+def test_values_no_schema_describes_are_copied_and_converted_in_order() -> None:
+    from oatschema._numbers import _planner, _resolve, _Walk
+
+    shared = {"z": -0.0}
+    value = {"n": 2.0, "t": (1.0, -0.0, (-0.0,)), "a": np.array([0.5, -0.0]), "s": [shared, shared], "e": ()}
+    walk = _Walk()
+    checked = walk.visit(value, _planner("classification", "0.9.0").top.child("extra"), ("x",), None, None)
+    assert checked == {"n": 2.0, "t": (1.0, 0.0, (0.0,)), "a": [0.5, 0.0], "s": [{"z": 0.0}, {"z": 0.0}], "e": ()}
+    assert type(checked["t"]) is tuple and type(checked["t"][2]) is tuple
+    assert checked["s"][0] is not checked["s"][1] and checked["s"][0] is not shared
+    assert [_resolve(item.path) for item in walk.converted] == [
+        ("x", "t", 1),
+        ("x", "t", 2, 0),
+        ("x", "a", 1),
+        ("x", "a"),
+        ("x", "s", 0, "z"),
+        ("x", "s", 1, "z"),
+    ]
+
+
+def test_repeated_object_in_a_list_is_copied_each_time() -> None:
+    label = {"label": "a", "score": 0.5}
+    checked = check_numbers({"labels": [label, label]}, "classification")
+    first, second = checked.record["labels"]
+    assert first is not second and first is not label
+
+
+def wide(**changes: Any) -> dict[str, Any]:
+    return {"data": {**{f"k{index}": index / 8 for index in range(100)}, **changes}}
+
+
+def test_wide_object_with_no_change_is_copied() -> None:
+    record = wide(text="a", flag=True, empty=None)
+    checked = check_numbers(record, "generic")
+    assert checked == CheckedRecord(record, (), ())
+    assert checked.record["data"] is not record["data"]
+
+
+@pytest.mark.parametrize(
+    ("value", "dropped", "converted"), [(NAN, True, False), (-0.0, False, True), (2**60, True, False)]
+)
+def test_one_changed_value_in_a_wide_object_is_found(value: float, dropped: bool, converted: bool) -> None:
+    checked = check_numbers(wide(k50=value), "generic")
+    assert [item.path for item in checked.dropped] == ([("data", "k50")] if dropped else [])
+    assert [item.path for item in checked.converted] == ([("data", "k50")] if converted else [])
+    assert list(checked.record["data"])[:3] == ["k0", "k1", "k2"]
+
+
+def test_non_str_key_in_a_wide_object_is_refused() -> None:
+    record = wide()
+    record["data"][7] = 0.5
+    with pytest.raises(TypeError, match="JSON data"):
+        check_numbers(record, "generic")
+
+
+def test_bounds_the_walk_does_not_follow_are_found() -> None:
+    from oatschema._numbers import _Planner
+
+    def hidden(schema: dict[str, Any]) -> bool:
+        return _Planner(schema).hidden_bounds
+
+    number = {"type": "number", "maximum": 1}
+    assert not hidden({"properties": {"x": number}, "$defs": {"n": number}})
+    assert not hidden({"properties": {"x": {"anyOf": [number, {"type": "string"}]}}})
+    assert hidden({"properties": {"x": {"maximum": 1}}})
+    assert hidden({"properties": {"x": {"type": "number"}}, "if": {}, "then": {"properties": {"x": number}}})
+    assert hidden({"$defs": {"n": number}, "if": {}, "then": {"properties": {"x": {"$ref": "#/$defs/n"}}}})
+    assert hidden({"properties": {"x": {"not": number}}})
+    names = {"document-extraction", "entity-extraction", "object-detection"}
+    for version in available_versions():
+        for path in (Path(oatschema.__file__).parent / "schemas" / version).glob("*.json"):
+            if path.name != "MANIFEST.json":
+                assert hidden(get_schema(cast(Any, path.stem), version)) is (path.stem in names)
+
+
+@pytest.mark.parametrize("version", ["0.6.0", "0.8.0", "0.9.0"])
+def test_bounds_only_pass_finds_what_every_error_finds(version: str) -> None:
+    from oatschema._numbers import _BOUND_KEYWORDS, _bound_paths
+
+    record: dict[str, Any] = {
+        "unit": "normalized",
+        "page_width": 2,
+        "blocks": [
+            {"block_type": "box", "box": {"x": 1.5, "y": 0.5, "width": 0.2, "height": 3}},
+            {"block_type": "polygon", "polygon": [{"x": 2, "y": 0.5}, {"x": 0.1, "y": 0.1}, {"x": 0.2, "y": -9}]},
+            {"block_type": "text", "text": "a", "score": 2, "page_number": 0},
+            {"block_type": "text"},
+        ],
+    }
+    validator = oatschema.get_validator("document-extraction", version)
+    every = {error.path for error in validator.iter_errors(record) if error.keyword in _BOUND_KEYWORDS}
+    assert len(every) >= 4
+    assert _bound_paths(record, validator, foreign=False) == every
+    assert (
+        _bound_paths({**record, "blocks": [*record["blocks"], {"text": "\ud800"}]}, validator, foreign=False) == set()
+    )
+
+
+def test_numbers_with_several_numeric_schemas_are_rechecked() -> None:
+    from oatschema._numbers import _Planner, _Walk
+
+    planner = _Planner({"properties": {"x": {"allOf": [{"type": "number", "maximum": 5}, {"type": "integer"}]}}})
+    walk = _Walk()
+    walk.visit({"x": 3}, planner.top, (), None, None)
+    assert walk.merged_bounds
+    walk = _Walk()
+    walk.visit({"x": 3}, _Planner({"properties": {"x": {"type": "number"}}}).top, (), None, None)
+    assert not walk.merged_bounds
+
+
+def test_conditions_that_refer_elsewhere_use_every_error() -> None:
+    from oatschema._numbers import _bounds_schema, _conditions_refer
+
+    assert _conditions_refer({"allOf": [{"if": {"properties": {"u": {"$ref": "#/$defs/u"}}}, "then": {}}]})
+    assert not _conditions_refer({"$ref": "#/$defs/u", "if": {"properties": {"u": {"const": 1}}}})
+    assert _bounds_schema(
+        {
+            "type": "object",
+            "required": ["x"],
+            "additionalProperties": False,
+            "properties": {"x": {"type": "number", "maximum": 5, "anyOf": [{"minimum": 0}]}},
+        }
+    ) == {"additionalProperties": True, "properties": {"x": {"maximum": 5}}}
+
+
+def test_numpy_object_arrays_that_contain_each_other_raise_type_error() -> None:
+    alone = np.empty(1, dtype=object)
+    alone[0] = alone
+    first, second = np.empty(1, dtype=object), np.empty(1, dtype=object)
+    first[0], second[0] = second, first
+    for array in (alone, first):
+        with pytest.raises(TypeError, match="contains itself"):
+            check_numbers({"labels": [], "attributes": {"k": array}}, "classification")

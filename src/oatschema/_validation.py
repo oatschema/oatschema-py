@@ -2,15 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import copyreg
+import hashlib
 import marshal
+import math
 import re
+import sys
 from collections.abc import Iterator
 from enum import Enum
 from functools import lru_cache
 from itertools import chain
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from oatschema._schemas import SchemaName, check_arguments, get_schema, resolve
+
+if TYPE_CHECKING:
+    import jsonschema_rs
 
 _MASK = "…"
 _PATH_PART_LIMIT = 100
@@ -26,6 +32,9 @@ _ENCODED_SURROGATE = re.compile(rb"\xed[\xa0-\xbf][\x80-\xbf]")
 _SCALAR_TYPES = frozenset({float, int, bool, type(None)})
 _MAX_SCAN_DEPTH = 2048
 _SURROGATE_MESSAGE = "… contains an unpaired surrogate, which RFC 7493 does not allow in JSON text"
+_TOO_DEEP = "Recursion limit reached"
+STAND_IN_DEPTH = 64
+_CONTAINERS = (dict, list, tuple)
 
 
 class ValidationError(ValueError):
@@ -127,6 +136,154 @@ def _surrogate_paths(record: Any) -> Iterator[tuple[str | int, ...]]:
     return _surrogates(record)
 
 
+_NOT_JSON = "the record must be JSON data (dict, list, str, int, float, bool or None)"
+
+
+def _resolved(value: Any) -> Any:
+    while isinstance(value, Enum):
+        inner = value.value
+        if inner is value:
+            raise TypeError(f"{_NOT_JSON}: an Enum value resolves to itself")
+        value = inner
+    return value
+
+
+def _is_container(value: Any) -> bool:
+    return isinstance(value, (dict, list)) or type(value) is tuple
+
+
+def _decimal_text(negative: bool, digits: str, exponent: int) -> bytes:
+    significant = digits.lstrip("0")
+    trimmed = significant.rstrip("0")
+    if not trimmed:
+        return b"n0"
+    exponent += len(significant) - len(trimmed)
+    return f"n{'-' if negative else ''}{trimmed}e{exponent}".encode()
+
+
+@lru_cache(maxsize=1)
+def _whole_floats_compare_exactly() -> bool:
+    return not _jsonschema_rs().validator_for({"const": 1e23}).is_valid(10**23)
+
+
+def _number_text(value: Any) -> bytes | None:
+    kind = type(value)
+    if kind is int:
+        try:
+            digits = str(abs(value))
+        except ValueError:
+            return None
+        return _decimal_text(value < 0, digits, 0)
+    if kind is float:
+        if not math.isfinite(value):
+            return None
+        if value.is_integer() and _whole_floats_compare_exactly():
+            return _decimal_text(value < 0, str(abs(int(value))), 0)
+        mantissa, _, power = repr(value).partition("e")
+        whole, _, fraction = mantissa.partition(".")
+        return _decimal_text(whole.startswith("-"), whole.lstrip("-") + fraction, int(power or 0) - len(fraction))
+    decimal = sys.modules.get("decimal")
+    if decimal is not None and kind is decimal.Decimal:
+        if not value.is_finite():
+            return None
+        sign, digits, exponent = value.as_tuple()
+        return _decimal_text(bool(sign), "".join(map(str, digits)), exponent)
+    raise TypeError(_NOT_JSON)
+
+
+def _scalar_digest(value: Any) -> bytes:
+    kind = type(value)
+    if value is None:
+        text = b"null"
+    elif kind is bool:
+        text = b"true" if value else b"false"
+    elif kind is str:
+        text = b"s" + value.encode("utf-8", "surrogatepass")
+    else:
+        number = _number_text(value)
+        text = f"u{id(value)}".encode() if number is None else number
+    return hashlib.sha256(text).digest()
+
+
+def _key(key: Any) -> str:
+    if type(key) is str:
+        return key
+    if isinstance(key, Enum) and isinstance(key, str):
+        return str(key.value)
+    raise TypeError(f"{_NOT_JSON}: a property name is not a str")
+
+
+def _container_digest(value: Any, digests: dict[int, bytes]) -> bytes:
+    def child(item: Any) -> bytes:
+        item = _resolved(item)
+        return digests[id(item)] if _is_container(item) else _scalar_digest(item)
+
+    if isinstance(value, dict):
+        entries = sorted((_key(key), item) for key, item in value.items())
+        digest = hashlib.sha256(b"{")
+        for key, item in entries:
+            encoded = key.encode("utf-8", "surrogatepass")
+            digest.update(len(encoded).to_bytes(8, "big") + encoded + child(item))
+    else:
+        digest = hashlib.sha256(b"[")
+        for item in value:
+            digest.update(child(item))
+    return digest.digest()
+
+
+def _stand_in(value: Any) -> str:
+    value = _resolved(value)
+    if not _is_container(value):
+        return _MASK + _scalar_digest(value).hex()
+    digests: dict[int, bytes] = {}
+    open_containers: set[int] = set()
+    stack: list[tuple[Any, bool]] = [(value, False)]
+    while stack:
+        node, finished = stack.pop()
+        ident = id(node)
+        if finished:
+            open_containers.discard(ident)
+            digests[ident] = _container_digest(node, digests)
+        elif ident not in digests:
+            if ident in open_containers:
+                raise TypeError(f"{_NOT_JSON}: it contains itself")
+            open_containers.add(ident)
+            stack.append((node, True))
+            children = node.values() if isinstance(node, dict) else node
+            stack.extend((item, False) for item in map(_resolved, children) if _is_container(item))
+    return _MASK + digests[id(value)].hex()
+
+
+def stand_in_deep_values(value: Any, *, depth: int = 0) -> Any:
+    """Return ``value`` with every value ``STAND_IN_DEPTH`` levels down replaced by a str.
+
+    Two replaced values get the same str when jsonschema-rs finds them equal, and otherwise differ unless SHA-256
+    collides, so ``const``, ``enum`` and ``uniqueItems`` decide as they would on ``value``. Ints and ``Decimal`` compare
+    by exact value, and a float by its ``repr``, except that a whole float compares by its exact value where the
+    installed jsonschema-rs does so (0.61 and later); NaN, infinities and ints too long for decimal text equal only the
+    same object.
+    Unchanged containers are shared with ``value``.
+    """
+    if depth == STAND_IN_DEPTH:
+        return _stand_in(value)
+    resolved = _resolved(value)
+    if isinstance(resolved, dict):
+        changed = {}
+        for key, item in resolved.items():
+            new = stand_in_deep_values(item, depth=depth + 1)
+            if new is not item:
+                changed[key] = new
+        return {**resolved, **changed} if changed else resolved
+    if isinstance(resolved, list) or type(resolved) is tuple:
+        if depth + 1 < STAND_IN_DEPTH and _SCALAR_TYPES.issuperset(map(type, resolved)):
+            return resolved
+        items = [stand_in_deep_values(item, depth=depth + 1) for item in resolved]
+        if all(new is old for new, old in zip(items, resolved, strict=True)):
+            return resolved
+        return tuple(items) if type(resolved) is tuple else items
+    return value
+
+
 def check_formats_argument(check_formats: object, call: str) -> None:
     """Raise ``TypeError``, naming ``call``, unless ``check_formats`` is a bool."""
     if not isinstance(check_formats, bool):
@@ -147,6 +304,27 @@ def _check_record_call(function: str, record: object, name: object, version: obj
     check_formats_argument(check_formats, call)
 
 
+def _jsonschema_rs() -> Any:
+    try:
+        import jsonschema_rs
+    except ImportError as error:
+        raise ImportError("validation needs jsonschema-rs: pip install 'oatschema[validate]'") from error
+    return jsonschema_rs
+
+
+def compile_schema(schema: dict[str, Any], *, check_formats: bool) -> "jsonschema_rs.Validator":
+    """Return a jsonschema-rs validator for ``schema``, configured as every ``Validator`` is."""
+    validator: jsonschema_rs.Validator = _jsonschema_rs().validator_for(
+        schema, validate_formats=check_formats, mask=_MASK, formats={"date-time": _is_date_time}
+    )
+    return validator
+
+
+def has_surrogate(record: Any) -> bool:
+    """Return whether a string or property name in ``record`` holds an unpaired surrogate."""
+    return next(_surrogate_paths(record), None) is not None
+
+
 def _not_json(error: ValueError) -> TypeError:
     return TypeError(
         f"the record must be JSON data (dict, list, str, int, float, bool or None): {shorten(str(error), 200)}"
@@ -165,20 +343,11 @@ class Validator:
 
     def __init__(self, name: SchemaName, version: str | None = None, *, check_formats: bool = True) -> None:
         _check_validator_call("Validator", name, version, check_formats)
-        try:
-            import jsonschema_rs
-        except ImportError as error:
-            raise ImportError("validation needs jsonschema-rs: pip install 'oatschema[validate]'") from error
         self._version = resolve(name, version)
         self._name = name
         self._check_formats = check_formats
-        self._validator = jsonschema_rs.validator_for(
-            get_schema(name, self._version),
-            validate_formats=check_formats,
-            mask=_MASK,
-            formats={"date-time": _is_date_time},
-        )
-        self._error_type = jsonschema_rs.ValidationError
+        self._validator = compile_schema(get_schema(name, self._version), check_formats=check_formats)
+        self._error_type = _jsonschema_rs().ValidationError
 
     def __repr__(self) -> str:
         formats = "" if self._check_formats else " check_formats=False"
@@ -212,11 +381,18 @@ class Validator:
         """
         if next(_surrogate_paths(record), None) is not None:
             return False
+        verdict = self._verdict(record)
+        if isinstance(verdict, TypeError):
+            raise verdict
+        return verdict
+
+    def _verdict(self, record: Any, *, stood_in: bool = False) -> bool | TypeError:
         try:
-            return self._validator.is_valid(record)
+            return bool(self._validator.is_valid(record))
         except ValueError as error:
-            failure = _not_json(error)
-        raise failure
+            if stood_in or str(error) != _TOO_DEEP:
+                return _not_json(error)
+        return self._verdict(stand_in_deep_values(record), stood_in=True)
 
     def validate(self, record: Any) -> None:
         """Raise ``ValidationError`` for an error in ``record``, if there is one.
@@ -224,19 +400,24 @@ class Validator:
         It stops at the first error jsonschema-rs finds, which is not always the first ``iter_errors`` yields.
         Raises ``TypeError`` if ``record`` is not JSON data, as ``is_valid`` does.
         """
-        failure: Exception
         path = next(_surrogate_paths(record), None)
         if path is not None:
             raise self._surrogate_error(path)
+        failure = self._failure(record)
+        if failure is not None:
+            raise failure
+
+    def _failure(self, record: Any, *, stood_in: bool = False) -> Exception | None:
         try:
             self._validator.validate(record)
         except self._error_type as error:
-            failure = self._convert(error)
+            return self._convert(error)
         except ValueError as error:
-            failure = _not_json(error)
+            if stood_in or str(error) != _TOO_DEEP:
+                return _not_json(error)
         else:
-            return
-        raise failure
+            return None
+        return self._failure(stand_in_deep_values(record), stood_in=True)
 
     def iter_errors(self, record: Any) -> Iterator[ValidationError]:
         """Return an iterator over every error in ``record``, as ``ValidationError``s.
@@ -250,13 +431,18 @@ class Validator:
         first = next(paths, None)
         if first is not None:
             return map(self._surrogate_error, chain((first,), paths))
+        errors = self._errors(record)
+        if isinstance(errors, TypeError):
+            raise errors
+        return map(self._convert, errors)
+
+    def _errors(self, record: Any, *, stood_in: bool = False) -> Iterator[Any] | TypeError:
         try:
-            errors = self._validator.iter_errors(record)
+            return self._validator.iter_errors(record)
         except ValueError as error:
-            failure = _not_json(error)
-        else:
-            return map(self._convert, errors)
-        raise failure
+            if stood_in or str(error) != _TOO_DEEP:
+                return _not_json(error)
+        return self._errors(stand_in_deep_values(record), stood_in=True)
 
     def _surrogate_error(self, path: tuple[str | int, ...]) -> ValidationError:
         return ValidationError(_SURROGATE_MESSAGE, schema_name=self._name, schema_version=self._version, path=path)
