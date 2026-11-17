@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.9.0.1 (unreleased)
+## 0.9.0.1 (2026-11-17)
 
 No schema changes: the bundled schema versions are still 0.4.0 to 0.9.0. Nothing breaks. Every record gets the same verdict as in 0.9.0.0, and `check_numbers` drops, converts, warns and raises exactly as before, except for the deep records below, which used to raise `TypeError`. The pin is still `oatschema[validate]>=0.9.0.0,<0.10`.
 
